@@ -1,0 +1,138 @@
+@php
+    $data = isset($data)? $data : NULL;
+    $data = isset($data->pivot)? $data->pivot : $data;
+    $col = option($data, 'col', 'col-md-12');
+    $amount = option($data, 'amount', 10);
+    $background = option($data, 'background', '');
+    $where =[
+        'statuses' => option($data, 'statuses', []),
+        'types' => option($data, 'task_types', []),
+        'employees' => option($data, 'users', [])
+    ];
+    $tasks = isset($data['tasks'])? $data['tasks'] : resolve('TaskService')->where($where, $amount);
+@endphp
+
+<div class="{{ $col }}">
+    <div class="kt-portlet {{ $background }}">
+        <div class="kt-portlet__head">
+            <div class="kt-portlet__head-label">
+                <h3 class="kt-portlet__head-title">
+                    @isset($title)
+                        {{ $title }}
+                    @else
+                        {{ trans('meridien.Listagem de Tarefas') }}
+                    @endisset
+                </h3>
+            </div>
+        </div>
+        <div class="kt-portlet__body">
+
+            <div class="kt-section">
+                <div class="kt-section__content">
+                    <table class="table datatable table-striped" id="">
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">{{ trans('meridien.Tipo') }}</th>
+                            <th scope="col">{{ trans('meridien.Data') }}</th>
+                            <th scope="col">{{ trans('meridien.tasks.hour') }}</th>
+                            <th scope="col">{{ trans('meridien.Status') }}</th>
+                            <th scope="col">{{ trans('meridien.tasks.user.destinated') }}</th>
+                            <th scope="col">{{ trans('meridien.tasks.user.responsible') }}</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($tasks as $task)
+                            <tr>
+                                <th scope="row">
+                                    <div class="">
+                                        <i class="{!! task($task, 'icon', Str::substr($task->type->name, 0, 1)) !!}"></i>
+                                    </div>
+                                </th>
+                                <td>
+                                    {!! task($task, 'name', 'Tarefa') !!}
+                                </td>
+                                <td>{{ $task->datetime->format('d/m/Y') }}</td>
+                                <td>{{ $task->datetime->format('h:m') ?? '' }}</td>
+                                <td>{{ $task->status->name }}</td>
+                                <td>
+                                {{ $task->destinateds->implode('name', ' - ') }}
+                                </td>
+                                <td>{{ $task->employees->implode('name', ', ') ?? '' }}</td>
+                                <td>
+
+                                    <span class="dropdown">
+                                        <a href="#"
+                                           class="btn btn-sm btn-clean btn-icon btn-icon-md"
+                                           data-toggle="dropdown" aria-expanded="true">
+                                            <i class="la la-ellipsis-h"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            @permission('tasks.edit')
+                                                <a class="dropdown-item" href="{{ route('tasks.edit', $task->id) }}">
+                                                    <i class="la la-edit"></i> {{ trans('meridien.edit') }}
+                                                </a>
+                                                <a class="dropdown-item"
+                                                   href="javascript:void(0);"
+                                                   data-toggle="modal" data-target="#modal{{ $task->id }}">
+                                                    <i class="la la-calendar"></i> {{ trans('meridien.reschedule') }}
+                                                </a>
+                                                <a class="dropdown-item" href="{{ route('tasks.edit', $task->id) }}"
+                                                    onclick="event.preventDefault(); if(!confirm('Tem certeza quedeseja fechar este item?')){ return false;}document.getElementById('updateStatus{{ $task->id }}').submit();">
+                                                    <i class="la la-close"></i> {{ trans('meridien.close') }}
+                                                </a>
+                                                {!! Form::model($task, ['route' => ['tasks.update.status', 'id' => $task->id, 'status_id' => $task->type->closedStatus->id], 'method' => 'PUT', 'class' => 'horizontal-form', 'id' => 'updateStatus' . $task->id]) !!}
+                                                    {!! Form::hidden('status_id', $task->type->closedStatus->id) !!}
+                                                {!! Form::close() !!}
+                                            @endpermission
+                                            @permission('tasks.show')
+                                                <a class="dropdown-item" href="{{ route('tasks.show', $task->id) }}">
+                                                    <i class="la la-eye"></i> {{ trans('meridien.show') }}
+                                                </a>
+                                            @endpermission
+                                            @permission('tasks.destroy')
+                                                <a
+                                                    class="dropdown-item"
+                                                    href="{{ route('tasks.destroy', $task->id) }}"
+                                                    onclick="event.preventDefault(); if(!confirm('Tem certeza quedeseja deletar este item?')){ return false; }document.getElementById('deleteTask{{ $task->id }}').submit();">
+                                                    <i class="la la-remove"></i> {{ trans('meridien.remove') }}
+                                                </a>
+                                            @endpermission
+                                        </div>
+                                    </span>
+
+                                    @permission('tasks.edit')
+                                        @include('tasks.partials.modal_reschedule', ['data' => ['id' => 'modal' . $task->id,'url' => route('tasks.reschedule', $task->id), 'title' => 'Reagendar Tarefa', 'data' => ['toggle' => 'modal', 'target' => '#modalReschedule']]])
+                                    @endpermission
+                                    @permission('tasks.destroy')
+                                        {!! Form::open(['route' => ['tasks.destroy', $task->id], 'method' => 'DELETE', 'class' => 'horizontal-form', 'id' => 'deleteTask' . $task->id]) !!}
+                                            {!! Form::hidden('id', $task->id) !!}
+                                        {!! Form::close() !!}
+                                    @endpermission
+
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @if(isset($slot))
+                {{ $slot }}
+            @endif
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+    <script>
+        $(document).ready(function () {
+
+            $("button.reschedule").click(function () {
+                $('.formModalReschedule').attr('action', $(this).attr('route'));
+            });
+
+        });
+    </script>
+@endpush

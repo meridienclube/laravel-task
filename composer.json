@@ -1,0 +1,31 @@
+{
+    "name": "confrariaweb/laravel-task",
+    "description": "Laravel Task Pack",
+    "keywords": [
+        "task",
+        "framework",
+        "laravel"
+    ],
+    "license": "MIT",
+    "type": "package",
+    "authors": [
+        {
+            "name": "Rafael Zingano",
+            "email": "confrariaweb@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "ConfrariaWeb\\Task\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ConfrariaWeb\\Task\\Providers\\TaskServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}

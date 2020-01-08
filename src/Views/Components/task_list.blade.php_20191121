@@ -1,0 +1,253 @@
+<div class="kt-portlet">
+    <div class="kt-portlet__head">
+        <div class="kt-portlet__head-label">
+            <h3 class="kt-portlet__head-title">
+                @isset($title)
+                    {{ $title }}
+                @else
+                    {{ trans('meridien.tasks.list') }}
+                @endisset
+            </h3>
+        </div>
+    </div>
+    <div class="kt-portlet__body">
+
+        <div class="kt-section">
+            <div class="kt-section__content">
+                <table class="table table-striped" id="datatable_tasks">
+                    <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">{{ trans('meridien.tasks.type') }}</th>
+                        <th scope="col">{{ trans('meridien.tasks.date') }}</th>
+                        <th scope="col">{{ trans('meridien.tasks.hour') }}</th>
+                        <th scope="col">{{ trans('meridien.status') }}</th>
+                        <th scope="col">{{ trans('meridien.tasks.priority') }}</th>
+                        <th scope="col">{{ trans('meridien.tasks.user.destinated') }}</th>
+                        <th scope="col">{{ trans('meridien.tasks.user.responsible') }}</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($tasks as $task)
+                        <tr>
+                            <th scope="row">
+                                <h4>{!! task($task, 'icon', null) !!}</h4>
+                            </th>
+                            <td>
+                                {!! task($task, 'name', 'Tarefa') !!}
+                            </td>
+                            <td>{{ $task->datetime->format('d/m/Y') }}</td>
+                            <td>{{ $task->datetime->format('h:m') ?? '' }}</td>
+                            <td>{{ $task->status->name }}</td>
+                            <td>{{ $task->priority }}</td>
+                            <td>
+                                @if($task->destinateds)
+                                    @foreach($task->destinateds as $destinated)
+                                        @if($destinated->roles)
+                                            @foreach($destinated->roles as $role)
+                                                @isset($role->settings['icon'])
+                                                    <i class="{{ $role->settings['icon'] }}" style="color: {{ $role->settings['color'] }}"></i>
+                                                @endisset
+                                            @endforeach
+                                        @endif
+                                        {{ $destinated->name }}
+                                    @endforeach
+                                @endif
+                            </td>
+                            <td>{{ $task->responsibles->implode('name', ', ') ?? '' }}</td>
+                            <td>
+                                    <span class="dropdown">
+                                        <a href="#"
+                                           class="btn btn-sm btn-clean btn-icon btn-icon-md"
+                                           data-toggle="dropdown" aria-expanded="true">
+                                            <i class="la la-ellipsis-h"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            @permission('tasks.edit')
+                                                @can('update', $task)
+                                                <a class="dropdown-item" href="{{ route('tasks.edit', $task->id) }}">
+                                                        <i class="la la-edit"></i> {{ trans('meridien.edit') }}
+                                                    </a>
+                                                <a class="dropdown-item"
+                                                   href="javascript:void(0);"
+                                                   data-toggle="modal" data-target="#modal{{ $task->id }}">
+                                                        <i class="la la-calendar"></i> {{ trans('meridien.reschedule') }}
+                                                    </a>
+                                                <a class="dropdown-item" href="{{ route('tasks.edit', $task->id) }}"
+                                                   onclick="event.preventDefault(); if(!confirm('Tem certeza quedeseja fechar este item?')){ return false;}document.getElementById('updateStatus{{ $task->id }}').submit();">
+                                                        <i class="la la-close"></i> {{ trans('meridien.conclude') }}
+                                                    </a>
+                                                {!! Form::model($task, ['route' => ['tasks.update.status', 'id' => $task->id, 'status_id' => $task->type->closedStatus->id], 'method' => 'PUT', 'class' => 'horizontal-form', 'id' => 'updateStatus' . $task->id]) !!}
+                                                {!! Form::hidden('status_id', $task->type->closedStatus->id) !!}
+                                                {!! Form::close() !!}
+                                            @endcan
+                                            @endpermission
+                                            @permission('tasks.show')
+                                                @can('view', $task)
+                                                <a class="dropdown-item" href="{{ route('tasks.show', $task->id) }}">
+                                                        <i class="la la-eye"></i> {{ trans('meridien.show') }}
+                                                    </a>
+                                            @endcan
+                                            @endpermission
+                                            <!--
+                                            @permission('tasks.destroy')
+                                                @can('delete', $task)
+                                                <a
+                                                    class="dropdown-item"
+                                                    href="{{ route('tasks.destroy', $task->id) }}"
+                                                    onclick="event.preventDefault(); if(!confirm('Tem certeza quedeseja deletar este item?')){ return false; }document.getElementById('deleteTask{{ $task->id }}').submit();">
+                                                        <i class="la la-remove"></i> {{ trans('meridien.remove') }}
+                                                    </a>
+                                            @endcan
+                                            @endpermission
+                                            -->
+                                        </div>
+                                    </span>
+                                @permission('tasks.edit')
+                                @include('tasks.partials.modal_reschedule', ['data' => ['id' => 'modal' . $task->id,'url' => route('tasks.reschedule', $task->id), 'title' => 'Reagendar Tarefa', 'data' => ['toggle' => 'modal', 'target' => '#modalReschedule']]])
+                                @endpermission
+                                @permission('tasks.destroy')
+                                {!! Form::open(['route' => ['tasks.destroy', $task->id], 'method' => 'DELETE', 'class' => 'horizontal-form', 'id' => 'deleteTask' . $task->id]) !!}
+                                {!! Form::hidden('id', $task->id) !!}
+                                {!! Form::close() !!}
+                                @endpermission
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @if(isset($slot))
+            {{ $slot }}
+        @endif
+    </div>
+</div>
+
+@push('scripts')
+    <script>
+
+        $(document).ready(function () {
+            var table = $('#datatable_users').DataTable({
+
+                "initComplete": function(settings, json) {
+                    $('#datatable_users tr td:nth-child(3)').each(function() {
+                        var str = $(this).html().toString();
+                        var stradmin = str.indexOf("Administrador");
+                        var stragreement = str.indexOf("Convênio");
+                        var strassociated = str.indexOf("Associado");
+                        var strmanager = str.indexOf("Gerente");
+                        var strprospect = str.indexOf("Prospect");
+                        var strsales = str.indexOf("Agente de Vendas");
+                        if(stradmin > -1) {
+                            $(this).html(str.replace('Administrador', '<span class="admin">Administrador</span>'))
+                        }
+                        if(stragreement > -1) {
+                            $(this).html(str.replace('Convênio', '<span class="agreement ">Convênio</span>'))
+                        }
+                        if(strassociated > -1) {
+                            $(this).html(str.replace('Associado', '<span class="associated">Associado</span>'))
+                        }
+                        if(strmanager > -1) {
+                            $(this).html(str.replace('Gerente', '<span class="manager">Gerente</span>'))
+                        }
+                        if(strprospect > -1) {
+                            $(this).html(str.replace('Prospect', '<span class="prospect">Prospect</span>'))
+                        }
+                        if(strsales > -1) {
+                            $(this).html(str.replace('Agente de Vendas', '<span class="sales">Agente de Vendas</span>'))
+                        }
+                    });
+                },
+
+                "processing": true,
+                "serverSide": true,
+                "ajax": "{{ route('tasks.datatable') }}",
+                "columns": [
+                    {"data": "column_last_task_employee"},
+                    {"data": "name"},
+                    {"data": "column_roles"},
+                    {"data": "column_steps"},
+                    {"data": "column_contacts"},
+                    { defaultContent: $('#btnsUser').html() }
+                ],
+                "language": {
+                    "sEmptyTable": "Nenhum registro encontrado",
+                    "sInfo": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 até 0 de 0 registros",
+                    "sInfoFiltered": "(Filtrados de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sInfoThousands": ".",
+                    "sLengthMenu": "_MENU_ resultados por página",
+                    "sLoadingRecords": "Carregando...",
+                    "sProcessing": "Processando...",
+                    "sZeroRecords": "Nenhum registro encontrado",
+                    "sSearch": "Pesquisar",
+                    "oPaginate": {
+                        "sNext": "Próximo",
+                        "sPrevious": "Anterior",
+                        "sFirst": "Primeiro",
+                        "sLast": "Último"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Ordenar colunas de forma ascendente",
+                        "sSortDescending": ": Ordenar colunas de forma descendente"
+                    },
+                    "select": {
+                        "rows": {
+                            "_": "Selecionado %d linhas",
+                            "0": "Nenhuma linha selecionada",
+                            "1": "Selecionado 1 linha"
+                        }
+                    }
+                }
+            });
+
+
+
+
+            $('#column1_search').on( 'keyup', function () {
+                table.columns(1).search(this.value).draw();
+            });
+            $('#column2_search').on( 'keyup', function () {
+                table.columns(2).search(this.value).draw();
+            });
+            $('#column3_search').on( 'change', function () {
+                table.columns(3).search(this.value).draw();
+            });
+            $('#column4_search').on( 'change', function () {
+                table.columns(4).search(this.value).draw();
+            });
+
+
+
+
+
+
+            $('#datatable_users tbody').on('click', '.show', function () {
+                var row = $(this).closest('tr');
+                var userID = table.row(row).data()["id"];
+                window.location.href = "/users/" + userID;
+            });
+
+            $('#datatable_users tbody').on('click', '.edit', function () {
+                var row = $(this).closest('tr');
+                var userID = table.row(row).data()["id"];
+                window.location.href = "/users/" + userID + '/edit';
+            });
+
+            $('#datatable_users tbody').on('click', '.destroy', function (event) {
+                event.preventDefault();
+                var row = $(this).closest('tr');
+                var userID = table.row(row).data()["id"];
+                var formDestroy = $('#delete-user-id');
+                if(confirm('Tem certeza que deseja deletar este item?')) {
+                    formDestroy.attr('action', "/users/" + userID);
+                    formDestroy.submit();
+                }
+            });
+
+        });
+    </script>
+@endpush
