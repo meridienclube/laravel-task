@@ -1,10 +1,8 @@
 <?PHP
 
-namespace MeridienClube\Meridien\Services;
+namespace ConfrariaWeb\Task\Services;
 
-use MeridienClube\Meridien\Contracts\TaskTypeContract;
-use Validator;
-use Auth;
+use ConfrariaWeb\Task\Contracts\TaskTypeContract;
 use ConfrariaWeb\Vendor\Traits\ServiceTrait;
 
 class TaskTypeService

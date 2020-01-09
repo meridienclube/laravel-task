@@ -46,7 +46,7 @@ class TaskCreatedNotification extends Notification implements ShouldQueue
             ->subject(__('tasks.notification'))
             ->greeting('Olá!')
             ->line('Uma tarefa de ' . $this->task->type->name . ' foi aberta')
-            ->action('Ver ' . $this->task->type->name, route('tasks.show', $this->task->id))
+            ->action('Ver ' . $this->task->type->name, route('admin.tasks.show', $this->task->id))
             ->line('Notificação gerada pelo sistema Meridien Clube!');
     }
 
@@ -60,7 +60,7 @@ class TaskCreatedNotification extends Notification implements ShouldQueue
     {
         return [
             'title' => __('tasks.created.name', ['name' => $this->task->type->name]),
-            'route' => route('tasks.show', $this->task->id),
+            'route' => route('admin.tasks.show', $this->task->id),
             'icon' => 'flaticon2-add-1',
             'notifiable' => $notifiable
         ];

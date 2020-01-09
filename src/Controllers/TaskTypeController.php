@@ -4,6 +4,7 @@ namespace ConfrariaWeb\Task\Controllers;
 
 use ConfrariaWeb\Task\Requests\StoreTaskTypeRequest;
 use ConfrariaWeb\Task\Requests\UpdateTaskTypeRequest;
+use App\Http\Controllers\Controller;
 
 class TaskTypeController extends Controller
 {
@@ -47,7 +48,7 @@ class TaskTypeController extends Controller
     {
         $tasks_types = resolve('TaskTypeService')->create($request->all());
         return redirect()
-            ->route('tasks.types.edit', $tasks_types->id)
+            ->route('admin.tasks.types.edit', $tasks_types->id)
             ->with('status', 'Tipo de tarefa criado com sucesso!');
     }
 
@@ -87,7 +88,7 @@ class TaskTypeController extends Controller
     {
         $task_type = resolve('TaskTypeService')->update($request->all(), $id);
         return redirect()
-            ->route('tasks.types.edit', $task_type->id)
+            ->route('admin.tasks.types.edit', $task_type->id)
             ->with('status', 'Tipo de tarefa editado com sucesso!');
     }
 
@@ -101,7 +102,7 @@ class TaskTypeController extends Controller
     {
         $task_type = resolve('TaskTypeService')->destroy($id);
         return redirect()
-            ->route('tasks.types.index')
+            ->route('admin.tasks.types.index')
             ->with('status', 'Tipo de tarefa deletado com sucesso!');
     }
 

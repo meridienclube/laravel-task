@@ -1,6 +1,6 @@
 <?php
 
-namespace ConfrariaWe\task\Models;
+namespace ConfrariaWeb\Task\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use ConfrariaWeb\Historic\Traits\HistoricTrait;

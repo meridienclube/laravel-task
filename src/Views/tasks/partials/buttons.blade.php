@@ -1,11 +1,11 @@
 @if(!$task_format['closed'])
     @permission('tasks.edit')
         @can('update', $task)
-            @include('tasks.partials.modal_comment_finalize', ['data' => ['task' => $task, 'url' => route('tasks.reschedule', $task_format['id']), 'btn' => ['label' => __($task_format['closedStatusName'])], 'title' => __($task_format['closedStatusName']), 'id' => 'formModalCommentFinalize', 'data' => ['toggle' => 'modal', 'target' => '#formModalCommentFinalize']]])
-            @btnEdit(["href" => route('tasks.edit', $task_format['id'])])
+            @include('tasks.partials.modal_comment_finalize', ['data' => ['task' => $task, 'url' => route('admin.tasks.reschedule', $task_format['id']), 'btn' => ['label' => __($task_format['closedStatusName'])], 'title' => __($task_format['closedStatusName']), 'id' => 'formModalCommentFinalize', 'data' => ['toggle' => 'modal', 'target' => '#formModalCommentFinalize']]])
+            @btnEdit(["href" => route('admin.tasks.edit', $task_format['id'])])
             {{ trans('meridien.edit') }}
             @endbtnEdit
-            @include('tasks.partials.modal_reschedule', ['data' => ['url' => route('tasks.reschedule', $task_format['id']), 'btn' => ['label' => 'Reagendar'], 'title' => 'Reagendar Tarefa', 'id' => 'modalReschedule', 'data' => ['toggle' => 'modal', 'target' => '#modalReschedule']]])
+            @include('tasks.partials.modal_reschedule', ['data' => ['url' => route('admin.tasks.reschedule', $task_format['id']), 'btn' => ['label' => 'Reagendar'], 'title' => 'Reagendar Tarefa', 'id' => 'modalReschedule', 'data' => ['toggle' => 'modal', 'target' => '#modalReschedule']]])
         @endcan
     @endpermission
     @permission('tasks.destroy')

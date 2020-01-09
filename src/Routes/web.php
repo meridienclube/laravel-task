@@ -5,7 +5,7 @@ Route::prefix('admin')
     ->middleware(['web', 'auth'])
     ->namespace('ConfrariaWeb\Task\Controllers')
     ->group(function () {
-/*
+
         Route::name('tasks.')->prefix('tasks')->group(function () {
 
             Route::get('index/{page}', 'TaskController@index')->name('index.page')->where('page', '[A-Za-z]+');
@@ -19,7 +19,7 @@ Route::prefix('admin')
             Route::post('{id}/close', 'TaskController@close')->name('close');
 
         });
-*/
+
         Route::resource('tasks', 'TaskController');
 
     });

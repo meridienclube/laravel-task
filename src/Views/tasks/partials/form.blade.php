@@ -56,10 +56,11 @@
                 {{ Form::select('priority', [1 => 'Muito baixa',2 => 'Baixa',3 => 'Normal', 4 => 'Alta', 5 => 'Muito alta'], isset($task)? $task->priority : null, ['class' => 'form-control select2 kt-select2']) }}
             </div>
         </div>
-
-        @foreach ($options as $option)
-            {!! option_input(isset($task)? $task : null, $option) !!}
-        @endforeach
+        @isset($options)
+            @foreach ($options as $option)
+                {!! option_input(isset($task)? $task : null, $option) !!}
+            @endforeach
+        @endisset
     </div>
-    @include('meridien::partials.portlet_footer_form_actions', ['cancel' => route('tasks.index')])
+    @include('meridien::partials.portlet_footer_form_actions', ['cancel' => route('admin.tasks.index')])
 </div>

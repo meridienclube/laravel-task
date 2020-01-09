@@ -60,7 +60,7 @@ class TaskCommentCreatedNotification extends Notification implements ShouldQueue
             ->subject(__('tasks.notification'))
             ->greeting('Olá!')
             ->line('Um comentário na tarefa de ' . $this->task->type->name . ' foi criado')
-            ->action('Ver Tarefa' . $this->task->type->name, route('tasks.show', $this->task->id))
+            ->action('Ver Tarefa' . $this->task->type->name, route('admin.tasks.show', $this->task->id))
             ->line('Notificação gerada pelo sistema Meridien Clube!');
     }
 
@@ -74,7 +74,7 @@ class TaskCommentCreatedNotification extends Notification implements ShouldQueue
     {
         return [
             'title' => __('tasks.comment.created'),
-            'route' => route('tasks.show', $this->task->id) . '#comments',
+            'route' => route('admin.tasks.show', $this->task->id) . '#comments',
             'icon' => 'flaticon2-add-1',
             'notifiable' => $notifiable
         ];

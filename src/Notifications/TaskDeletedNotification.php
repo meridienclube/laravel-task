@@ -47,7 +47,7 @@ class TaskDeletedNotification extends Notification implements ShouldQueue
             ->subject(__('tasks.notification'))
             ->greeting('Olá!')
             ->line('Uma tarefa de ' . $this->task->type->name . ' foi deletada')
-            //->action('Ver ' . $this->task->type->name, route('tasks.show', $this->task->id))
+            //->action('Ver ' . $this->task->type->name, route('admin.tasks.show', $this->task->id))
             ->line('Notificação gerada pelo sistema Meridien Clube!');
     }
 
@@ -61,7 +61,7 @@ class TaskDeletedNotification extends Notification implements ShouldQueue
     {
         return [
             'title' => __('tasks.deleted.name', ['name' => $this->task->type->name]),
-            'route' => route('tasks.show', $this->task->id),
+            'route' => route('admin.tasks.show', $this->task->id),
             'icon' => 'flaticon2-trash',
             'notifiable' => $notifiable
         ];

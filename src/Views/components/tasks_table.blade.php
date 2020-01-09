@@ -15,9 +15,9 @@
                 <table class="table table-striped" id="">
                     <thead class="thead-dark">
                         <tr>
-                            <th scope="col"></th>  
-                            <th scope="col">Tipo</th>  
-                            <th scope="col">Associado</th>         
+                            <th scope="col"></th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Associado</th>
                             <!--th scope="col">Responsavel</th-->
                             <th scope="col">Data</th>
                             <th scope="col">De</th>
@@ -26,7 +26,7 @@
                     </thead>
                     <tbody>
                     @foreach($tasks as $task)
-                        <tr> 
+                        <tr>
                             <th scope="row">
                                 <div class="">
                                     @if(isset($task->type->options['icon']))
@@ -38,23 +38,23 @@
                             </th>
                             <td>
                                 {{ $task->type->name }}
-                            </td>   
+                            </td>
                             <td>
                                 {{ $task->associates->implode('name', ' - ') }}
-                            </td>              
+                            </td>
                             <!--td>{{ $task->employees->implode('name', ' - ') }}</td-->
                             <td>{{ $task->datetime->format('d/m/Y') }}</td>
                             <td>{{ $task->user->name }}</td>
                             <td>
                                 <div class="btn-group btn-group-sm float-right" role="group" aria-label="...">
                                     @permission('tasks.show')
-                                    <a href="{{ route('tasks.show', $task->id) }}" 
+                                    <a href="{{ route('admin.tasks.show', $task->id) }}"
                                         class="btn btn-clean btn-icon btn-label-primary btn-icon-md " title="View">
                                         <i class="la la-eye"></i>
                                     </a>
                                     @endpermission
                                     @permission('tasks.edit')
-                                    <a href="{{ route('tasks.edit', $task->id) }}" 
+                                    <a href="{{ route('admin.tasks.edit', $task->id) }}"
                                         class="btn btn-clean btn-icon btn-label-success btn-icon-md " title="Edit">
                                         <i class="la la-edit"></i>
                                     </a>
@@ -63,13 +63,13 @@
                                     <a href="javascript:void(0);"
                                         onclick="event.preventDefault();
                                         if(!confirm('Tem certeza que deseja deletar este item?')){ return false; }
-                                        document.getElementById('delete-task-{{ $task->id }}').submit();" 
+                                        document.getElementById('delete-task-{{ $task->id }}').submit();"
                                         class="btn btn-clean btn-icon btn-label-danger btn-icon-md "
                                         title="Deletar">
                                             <i class="la la-remove"></i>
                                     </a>
-                                    <form 
-                                        action="{{ route('tasks.destroy', $task->id) }}" 
+                                    <form
+                                        action="{{ route('admin.tasks.destroy', $task->id) }}"
                                         method="POST" id="delete-task-{{ $task->id }}">
                                         <input type="hidden" name="_method" value="DELETE">
                                         @csrf
@@ -78,7 +78,7 @@
                                 </div>
                             </td>
                         </tr>
-                    @endforeach       
+                    @endforeach
                     </tbody>
                 </table>
                 {{ $tasks->links() }}

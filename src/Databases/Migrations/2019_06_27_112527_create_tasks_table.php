@@ -6,13 +6,29 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateTasksTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
+
     public function up()
     {
+
+        Schema::create('task_steps', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->integer('order')->default(1);
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('task_statuses', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('slug');
+            $table->integer('order')->default(1);
+            $table->integer('closure')->default(0);
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
         Schema::create('task_types', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('closed_status_id');
@@ -25,7 +41,7 @@ class CreateTasksTable extends Migration
 
             $table->foreign('closed_status_id')
                 ->references('id')
-                ->on('statuses');
+                ->on('task_statuses');
         });
 
         Schema::create('tasks', function (Blueprint $table) {
@@ -41,12 +57,14 @@ class CreateTasksTable extends Migration
 
             $table->foreign('status_id')
                 ->references('id')
-                ->on('statuses')
+                ->on('task_statuses')
                 ->onDelete('cascade');
+
             $table->foreign('type_id')
                 ->references('id')
                 ->on('task_types')
                 ->onDelete('cascade');
+
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
@@ -62,6 +80,7 @@ class CreateTasksTable extends Migration
                 ->on('options')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+
             $table->foreign('task_id')
                 ->references('id')
                 ->on('tasks')
@@ -71,9 +90,6 @@ class CreateTasksTable extends Migration
             $table->primary(['option_id', 'task_id']);
         });
 
-        /**
-         * Esta tabela relaciona o usuario a tarefa.
-         */
         Schema::create('task_user', function (Blueprint $table) {
             $table->unsignedBigInteger('task_id');
             $table->unsignedBigInteger('user_id');
@@ -82,6 +98,7 @@ class CreateTasksTable extends Migration
                 ->references('id')
                 ->on('tasks')
                 ->onDelete('cascade');
+
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
@@ -99,6 +116,7 @@ class CreateTasksTable extends Migration
                 ->on('tasks')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
@@ -108,31 +126,6 @@ class CreateTasksTable extends Migration
             $table->primary(['task_id', 'user_id']);
         });
 
-        /**
-         * Relaciona o usuario associado a tarefa,
-         * quando  essa for para atender a um associado
-         */
-        Schema::create('task_associated', function (Blueprint $table) {
-            $table->unsignedBigInteger('task_id');
-            $table->unsignedBigInteger('user_id');
-
-            $table->foreign('task_id')
-                ->references('id')
-                ->on('tasks')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->foreign('user_id')
-                ->references('id')
-                ->on('users')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-
-            $table->primary(['task_id', 'user_id']);
-        });
-
-        /**
-         * Relaciona o usuario responsavel da tarefa a tarefa
-         */
         Schema::create('task_responsible', function (Blueprint $table) {
             $table->unsignedBigInteger('task_id');
             $table->unsignedBigInteger('user_id');
@@ -142,6 +135,7 @@ class CreateTasksTable extends Migration
                 ->on('tasks')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
@@ -151,27 +145,6 @@ class CreateTasksTable extends Migration
             $table->primary(['task_id', 'user_id']);
         });
 
-        Schema::create('task_employee', function (Blueprint $table) {
-            $table->unsignedBigInteger('task_id');
-            $table->unsignedBigInteger('user_id');
-
-            $table->foreign('task_id')
-                ->references('id')
-                ->on('tasks')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->foreign('user_id')
-                ->references('id')
-                ->on('users')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-
-            $table->primary(['task_id', 'user_id']);
-        });
-
-        /**
-         * Relaciona a tarefa a sua etapa
-         */
         Schema::create('task_step', function (Blueprint $table) {
             $table->unsignedBigInteger('task_id');
             $table->unsignedBigInteger('step_id');
@@ -181,9 +154,10 @@ class CreateTasksTable extends Migration
                 ->on('tasks')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+
             $table->foreign('step_id')
                 ->references('id')
-                ->on('steps')
+                ->on('task_steps')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
 
@@ -192,21 +166,16 @@ class CreateTasksTable extends Migration
 
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('task_step');
         Schema::dropIfExists('task_responsible');
-        Schema::dropIfExists('task_employee');
         Schema::dropIfExists('task_destinated');
-        Schema::dropIfExists('task_associated');
         Schema::dropIfExists('task_user');
         Schema::dropIfExists('option_task');
         Schema::dropIfExists('tasks');
         Schema::dropIfExists('task_types');
+        Schema::dropIfExists('task_statuses');
+        Schema::dropIfExists('task_steps');
     }
 }

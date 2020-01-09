@@ -28,7 +28,7 @@
             <td>
                 <div class="btn-group btn-group-sm float-right" role="group" aria-label="...">
                     @permission('tasks.show')
-                    <a href="{{ route('tasks.show', $task->id) }}"
+                    <a href="{{ route('admin.tasks.show', $task->id) }}"
                        class="btn btn-clean btn-icon btn-label-primary btn-icon-md " title="View">
                         <i class="la la-eye"></i>
                     </a>
@@ -42,7 +42,7 @@
                         data-target="#modalReschedule">
                         <i class="la la-calendar"></i>
                     </button>
-                    <a href="{{ route('tasks.edit', $task->id) }}"
+                    <a href="{{ route('admin.tasks.edit', $task->id) }}"
                        class="btn btn-clean btn-icon btn-label-success btn-icon-md " title="Edit">
                         <i class="la la-edit"></i>
                     </a>
@@ -57,7 +57,7 @@
                         <i class="la la-remove"></i>
                     </a>
                     <form
-                        action="{{ route('tasks.destroy', $task->id) }}"
+                        action="{{ route('admin.tasks.destroy', $task->id) }}"
                         method="POST" id="delete-task-{{ $task->id }}">
                         <input type="hidden" name="_method" value="DELETE">
                         @csrf

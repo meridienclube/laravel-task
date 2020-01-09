@@ -8,6 +8,8 @@ use ConfrariaWeb\Task\Requests\UpdateTaskRequest;
 use ConfrariaWeb\Task\Resources\TaskResource;
 use ConfrariaWeb\Task\Resources\UserResource;
 use Auth;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class TaskController extends Controller
 {
@@ -19,11 +21,6 @@ class TaskController extends Controller
 
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Response
-     */
     public function index(Request $request, $page = null)
     {
         $all = $request->all();
@@ -40,27 +37,14 @@ class TaskController extends Controller
         ];
 
         if ($page == 'calendar') {
-            return view('tasks.calendar', $this->data);
+            return view(config('cw_task.views') . 'calendar', $this->data);
         }
-        return view('tasks.index', $this->data);
+        return view(config('cw_task.views') . 'index', $this->data);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Response
-     */
     public function create(Request $request)
     {
-        $this->data['breadcrumb'] = [
-            route('tasks.index') => __('tasks.list'),
-            '#' => __('tasks.new')
-        ];
-        $this->data['buttons'] = [
-            route('tasks.index') => ['label' => __('return'), 'icon' => 'flaticon2-back'],
-            route('tasks.create') => ['label' => __('tasks.new'), 'icon' => 'fa fa-plus']
-        ];
-        $this->data['statuses'] = Auth::user()->roleTasksStatuses;
+        $this->data['statuses'] = resolve('TaskStatusService')->all();
         $taskemployees = ($request->taskemployees) ? $request->taskemployees : [Auth::user()->id];
         $this->data['tasks'] = resolve('TaskService')->take(10)->where(['employees', $taskemployees])->get();
         $this->data['types'] = resolve('TaskTypeService')->all();
@@ -71,7 +55,7 @@ class TaskController extends Controller
         }
         $this->data['selecteds']['responsibles'] = [auth()->id() => auth()->user()->name];
 
-        return view('tasks.create', $this->data);
+        return view(config('cw_task.views') . 'create', $this->data);
     }
 
     /**
@@ -84,7 +68,7 @@ class TaskController extends Controller
     {
         $task = resolve('TaskService')->create($request->all());
         return redirect()
-            ->route('tasks.edit', $task->id)
+            ->route('admin.tasks.edit', $task->id)
             ->with('status', 'tarefa criada com sucesso!');
     }
 
@@ -103,12 +87,12 @@ class TaskController extends Controller
         $this->data['task'] = $task;
         $this->data['task_format'] = $task->format();
         $this->data['breadcrumb'] = [
-            route('tasks.index') => 'Lista de tarefas',
+            route('admin.tasks.index') => 'Lista de tarefas',
             '#' => $this->data['task_format']['title']
         ];
         $this->data['buttons'] = [
-            route('tasks.index') => ['label' => __('return'), 'icon' => 'flaticon2-back'],
-            route('tasks.create') => ['label' => __('tasks.new'), 'icon' => 'fa fa-plus'],
+            route('admin.tasks.index') => ['label' => __('return'), 'icon' => 'flaticon2-back'],
+            route('admin.tasks.create') => ['label' => __('tasks.new'), 'icon' => 'fa fa-plus'],
             'include' => 'tasks.partials.buttons'
         ];
         $this->data['tasks'] = resolve('TaskService')->all();
@@ -134,13 +118,13 @@ class TaskController extends Controller
         $this->data['task'] = $task;
         $this->data['task_format'] = $task->format();
         $this->data['breadcrumb'] = [
-            route('tasks.index') => 'Lista de tarefas',
+            route('admin.tasks.index') => 'Lista de tarefas',
             '#' => $this->data['task_format']['title']
         ];
         $this->data['buttons'] = [
-            route('tasks.index') => ['label' => __('return'), 'icon' => 'flaticon2-back'],
-            route('tasks.create') => ['label' => __('tasks.new'), 'icon' => 'fa fa-plus'],
-            route('tasks.show', $task->id) => ['label' => __('tasks.show'), 'icon' => 'fa fa-show'],
+            route('admin.tasks.index') => ['label' => __('return'), 'icon' => 'flaticon2-back'],
+            route('admin.tasks.create') => ['label' => __('tasks.new'), 'icon' => 'fa fa-plus'],
+            route('admin.tasks.show', $task->id) => ['label' => __('tasks.show'), 'icon' => 'fa fa-show'],
         ];
         $this->data['statuses'] = Auth::user()->roleTasksStatuses;
         $taskemployees = [];//isset($request->taskemployees)? $request->taskemployees : $task->employees->pluck('id');
@@ -162,7 +146,7 @@ class TaskController extends Controller
     {
         $task = resolve('TaskService')->update($request->all(), $id);
         return redirect()
-            ->route('tasks.edit', $task->id)
+            ->route('admin.tasks.edit', $task->id)
             ->with('status', 'Tarefa editado com sucesso!');
     }
 
@@ -176,7 +160,7 @@ class TaskController extends Controller
     {
         $task = resolve('TaskService')->destroy($id);
         return redirect()
-            ->route('tasks.index')
+            ->route('admin.tasks.index')
             ->with('status', 'Tarefa deletado com sucesso!');
     }
 
@@ -189,7 +173,7 @@ class TaskController extends Controller
     {
         $TaskService = resolve('TaskService')->createComment($request->all(), $task_id);
         return redirect()
-            ->route('tasks.show', $task_id)
+            ->route('admin.tasks.show', $task_id)
             ->with('status', 'Comentário criado com sucesso!');
     }
 
@@ -232,9 +216,9 @@ class TaskController extends Controller
         //return back()->withInput()
         //->with('status', 'Tarefa atualizada com sucesso!');
         /*return redirect()
-            ->route('tasks.index')
+            ->route('admin.tasks.index')
             ->with('status', 'Tarefa atualizada com sucesso!');*/
-        return redirect()->route('tasks.index')->with('status', 'Tarefa atualizada com sucesso!');
+        return redirect()->route('admin.tasks.index')->with('status', 'Tarefa atualizada com sucesso!');
     }
 
     public function datatable(Request $request)

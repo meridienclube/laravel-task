@@ -39,7 +39,7 @@
 </div>
 
 <div style="display: none" id="btnsTask">
-    @include('tasks.partials.buttons_datatable')
+    @include('task::tasks.partials.buttons_datatable')
 </div>
 
 @push('scripts')

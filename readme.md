@@ -1,10 +1,18 @@
 # Package Vendor Laravel
 
-Base package for all other laravel packages
+Laravel Task Package
 
-## layouts
+## Includes https://jqueryui.com/datepicker/
+```HTML
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+```
 
-Include for icon usage the following google library <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+## Includes https://timepicker.co/
+```HTML
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+```
 
 ## License
 

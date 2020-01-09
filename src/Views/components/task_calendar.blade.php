@@ -109,7 +109,7 @@
 
                         eventDrop: function (info) {
                             if (confirm("Você tem certeza sobre essa mudança? ")) {
-                                $.post("{{ route('tasks.update.date') }}",
+                                $.post("{{ route('admin.tasks.update.date') }}",
                                     {
                                         task_id: info.event.extendedProps.task_id,
                                         date: info.event.start.toUTCString()

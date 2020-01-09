@@ -2,8 +2,8 @@
 
 Route::middleware(['auth:api'])
     ->namespace('ConfrariaWeb\Task\Controllers')
-    ->name('api.')
-    ->prefix('api')
+    ->name('api.tasks.')
+    ->prefix('api/tasks')
     ->group(function () {
 
         Route::get('calendar', 'TaskController@calendar')->name('calendar');

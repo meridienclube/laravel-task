@@ -1,8 +1,8 @@
 <?PHP
 
-namespace MeridienClube\Meridien\Services;
+namespace ConfrariaWeb\Task\Services;
 
-use MeridienClube\Meridien\Contracts\TaskContract;
+use ConfrariaWeb\Task\Contracts\TaskContract;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;

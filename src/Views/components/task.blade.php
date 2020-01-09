@@ -28,13 +28,13 @@
                 <div class="dropdown-menu dropdown-menu-right">
                     <ul class="kt-nav">
                         <li class="kt-nav__item">
-                            <a href="{{ route('tasks.show', $task->id) }}" class="kt-nav__link">
+                            <a href="{{ route('admin.tasks.show', $task->id) }}" class="kt-nav__link">
                                 <i class="kt-nav__link-icon flaticon-visible"></i>
                                 <span class="kt-nav__link-text">{{ trans('meridien.tasks.show') }}</span>
                             </a>
                         </li>
                         <li class="kt-nav__item">
-                            <a href="{{ route('tasks.edit', $task->id) }}" class="kt-nav__link">
+                            <a href="{{ route('admin.tasks.edit', $task->id) }}" class="kt-nav__link">
                                 <i class="kt-nav__link-icon flaticon2-edit"></i>
                                 <span class="kt-nav__link-text">{{ trans('meridien.tasks.edit') }}</span>
                             </a>
@@ -64,7 +64,7 @@
                                 <span class="btn btn-label-warning btn-sm">{{ $task->datetime->format('d/m/Y') }}</span>
                             </div>
                             <div class="kt-widget__action">
-                                <a href="{{ route('tasks.show', $task->id) }}" class="btn btn-label-brand btn-bold btn-sm btn-upper">
+                                <a href="{{ route('admin.tasks.show', $task->id) }}" class="btn btn-label-brand btn-bold btn-sm btn-upper">
                                     {{ trans('meridien.tasks.show') }}
                                 </a>
                             </div>
