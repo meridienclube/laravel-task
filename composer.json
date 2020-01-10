@@ -14,7 +14,16 @@
             "email": "confrariaweb@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "confrariaweb/laravel-entrust": "dev-master",
+        "confrariaweb/laravel-fullcalendar": "dev-master",
+        "confrariaweb/laravel-historic": "dev-master",
+        "confrariaweb/laravel-modal": "dev-master",
+        "confrariaweb/laravel-option": "dev-master",
+        "confrariaweb/laravel-select2": "dev-master",
+        "confrariaweb/laravel-user": "dev-master",
+        "confrariaweb/laravel-vendor": "dev-master"
+    },
     "autoload": {
         "psr-4": {
             "ConfrariaWeb\\Task\\": "src"

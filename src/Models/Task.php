@@ -4,6 +4,8 @@ namespace ConfrariaWeb\Task\Models;
 
 use ConfrariaWe\task\Scopes\TaskStatusCompletedScope;
 use ConfrariaWeb\Comment\Traits\CommentTrait;
+use ConfrariaWeb\Fullcalendar\Event;
+use ConfrariaWeb\Fullcalendar\IdentifiableEvent;
 use Illuminate\Database\Eloquent\Model;
 use MeridienClube\Meridien\Scopes\TaskUserScope;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,7 +16,7 @@ use ConfrariaWeb\Historic\Traits\HistoricTrait;
 use ConfrariaWeb\Option\Traits\OptionTrait;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
-class Task extends Model
+class Task extends Model implements IdentifiableEvent
 {
     use CommentTrait;
     use HistoricTrait;
@@ -33,6 +35,8 @@ class Task extends Model
 
     protected $dates = [
         'datetime',
+        'start',
+        'end'
     ];
 
     /**
@@ -46,6 +50,60 @@ class Task extends Model
         //static::addGlobalScope(new TaskUserScope);
         //static::addGlobalScope(new TaskStatusCompletedScope);
     }
+
+
+    /**
+     * Get the event's id number
+     *
+     * @return int
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    /**
+     * Get the event's title
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * Is it an all day event?
+     *
+     * @return bool
+     */
+    public function isAllDay()
+    {
+        return (bool)$this->all_day;
+    }
+
+    /**
+     * Get the start time
+     *
+     * @return DateTime
+     */
+    public function getStart()
+    {
+        return $this->start;
+    }
+
+    /**
+     * Get the end time
+     *
+     * @return DateTime
+     */
+    public function getEnd()
+    {
+        return $this->end;
+    }
+
+
+
+
 
     public function status()
     {

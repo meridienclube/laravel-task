@@ -50,6 +50,8 @@ class CreateTasksTable extends Migration
             $table->unsignedBigInteger('type_id');
             $table->unsignedBigInteger('user_id');
             $table->timestamp('datetime')->useCurrent();
+            $table->timestamp('start')->useCurrent();
+            $table->timestamp('end')->useCurrent();
             //$table->text('options')->nullable();
             $table->smallInteger('priority')->default(1);
             $table->timestamps();
