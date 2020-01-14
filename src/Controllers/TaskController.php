@@ -2,6 +2,8 @@
 
 namespace ConfrariaWeb\Task\Controllers;
 
+use Auth;
+use App\Http\Controllers\Controller;
 use ConfrariaWeb\Fullcalendar\Calendar;
 use ConfrariaWeb\Task\Models\Task;
 use ConfrariaWeb\Task\Requests\StoreTaskCommentRequest;
@@ -9,9 +11,10 @@ use ConfrariaWeb\Task\Requests\StoreTaskRequest;
 use ConfrariaWeb\Task\Requests\UpdateTaskRequest;
 use ConfrariaWeb\Task\Resources\TaskResource;
 use ConfrariaWeb\Task\Resources\UserResource;
-use Auth;
+use ConfrariaWeb\Task\Services\TaskService;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+
+use Illuminate\Support\LazyCollection;
 
 class TaskController extends Controller
 {
@@ -20,61 +23,46 @@ class TaskController extends Controller
 
     public function __construct()
     {
-
-    }
-
-    public function index(Request $request, $page = null)
-    {
-        $all = $request->all();
-        $this->data['get'] = $all;
         $this->data['types'] = resolve('TaskTypeService')->all();
-        $this->data['employees'] = resolve('UserService')->employees();
-        $this->data['responsibles'] = resolve('UserService')->employees();
-
-        $this->data['datatable'] = [
-            'id' => 'datatable_tasks',
-            'items' => ['title', 'date', 'time', 'status', 'priority', 'destinateds', 'responsibles'],
-            'url' => 'tasks',
-            'slug' => 'tasks'
-        ];
-
-        if ($page == 'calendar') {
-            return view(config('cw_task.views') . 'calendar', $this->data);
-        }
-        return view(config('cw_task.views') . 'index', $this->data);
     }
 
-    public function calendar(){
+    public function index()
+    {
+        return view(config('cw_task.views') . 'tasks.index', $this->data);
+    }
+
+    public function calendar(TaskService $taskService)
+    {
         $events = [];
+        $tasks = Task::cursor();
 
-        $events[] = \Calendar::event(
-            'Event One', //event title
-            false, //full day event?
-            '2015-02-11T0800', //start time (you can also use Carbon instead of DateTime)
-            '2015-02-12T0800', //end time (you can also use Carbon instead of DateTime)
-            0 //optionally, you can specify an event ID
-        );
+        foreach ($tasks as $task) {
 
-        $events[] = \Calendar::event(
-            "Valentine's Day", //event title
-            true, //full day event?
-            new \DateTime('2015-02-14'), //start time (you can also use Carbon instead of DateTime)
-            new \DateTime('2015-02-14'), //end time (you can also use Carbon instead of DateTime)
-            'stringEventId' //optionally, you can specify an event ID
-        );
+            $events[] = \ConfrariaWeb\Fullcalendar\Facades\Calendar::event(
+                $task->type->name, //event title
+                false, //full day event?
+                $task->start, //start time (you can also use Carbon instead of DateTime)
+                $task->end, //end time (you can also use Carbon instead of DateTime)
+                $task->id, //optional event ID
+                [
+                    'url' => route('admin.tasks.show', $task->id)
+                ]
+            );
 
+        }
         $eloquentEvent = Task::first();
 
-        $calendar = \Calendar::addEvents($events)
-        ->addEvent($eloquentEvent, [
-            'color' => '#800',
-        ])->setOptions([
-            'firstDay' => 1
-        ])->setCallbacks([
-            'viewRender' => 'function() {alert("Callbacks!");}'
-        ]);
+        $calendar = \ConfrariaWeb\Fullcalendar\Facades\Calendar::addEvents(Task::cursor())
+            ->addEvent($eloquentEvent, [
+                'color' => '#800',
+                'eventClick' => 'function() {alert("teste")}'
+            ])->setOptions([
+                'firstDay' => 1
+            ])->setCallbacks([
+                'viewRender' => 'function() {}'
+            ]);
 
-        return view(config('cw_task.views') . 'calendar', compact('calendar'));
+        return view(config('cw_task.views') . 'tasks.calendar', compact('calendar'));
 
     }
 
@@ -91,7 +79,7 @@ class TaskController extends Controller
         }
         $this->data['selecteds']['responsibles'] = [auth()->id() => auth()->user()->name];
 
-        return view(config('cw_task.views') . 'create', $this->data);
+        return view(config('cw_task.views') . 'tasks.create', $this->data);
     }
 
     /**
@@ -275,8 +263,8 @@ class TaskController extends Controller
 
         if (isset($data['columns'][1]['search']['value'])) {
             $dataa = explode(',', $data['columns'][1]['search']['value']);
-            $data['where']['from'] = isset($dataa[0])? $dataa[0] : NULL;
-            $data['where']['to'] = isset($dataa[1])? $dataa[1] : NULL;
+            $data['where']['from'] = isset($dataa[0]) ? $dataa[0] : NULL;
+            $data['where']['to'] = isset($dataa[1]) ? $dataa[1] : NULL;
         }
 
         /*

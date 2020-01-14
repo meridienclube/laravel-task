@@ -101,6 +101,13 @@ class Task extends Model implements IdentifiableEvent
         return $this->end;
     }
 
+    public function getEventOptions()
+    {
+        return [
+            'color' => $this->type->color,
+        ];
+    }
+
 
 
 

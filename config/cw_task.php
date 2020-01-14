@@ -5,9 +5,15 @@ return [
     'views' => env('CW_VIEWS', 'task::tasks.'),
     'priorities' => [
         5 => 'Muito alta',
-        4 =>'Alta',
+        4 => 'Alta',
         3 => 'Normal',
         2 => 'Baixa',
-        1=> 'Muito baixa'
+        1 => 'Muito baixa'
+    ],
+    'datatable' => [
+        'id' => 'datatable_tasks',
+        'items' => ['title', 'date', 'time', 'status', 'priority', 'destinateds', 'responsibles'],
+        'url' => 'tasks',
+        'slug' => 'tasks'
     ]
 ];
