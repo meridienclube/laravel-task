@@ -1,12 +1,11 @@
 <?php
 
-namespace MeridienClube\Meridien\Events;
+namespace ConfrariaWeb\Task\Events;
 
-use MeridienClube\Meridien\Historics\TaskCommentCreatedHistoricContract;
-use MeridienClube\Meridien\Historics\TaskCreatedHistoricContract;
-use MeridienClube\Meridien\Notifications\TaskCreatedNotification;
-use MeridienClube\Meridien\Notifications\TaskUpdatedNotification;
-use MeridienClube\Meridien\Task;
+use ConfrariaWeb\Task\Historics\TaskCommentCreatedHistoric;
+use ConfrariaWeb\Task\Notifications\TaskCreatedNotification;
+use ConfrariaWeb\Task\Notifications\TaskUpdatedNotification;
+use ConfrariaWeb\Task\Models\Task;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -30,7 +29,7 @@ class TaskCommentCreatedEvent
     public function __construct(Task $task)
     {
         $this->obj = $task;
-        $this->historic = new TaskCommentCreatedHistoricContract($task);
+        $this->historic = new TaskCommentCreatedHistoric($task);
         $this->when = 'created';
     }
 

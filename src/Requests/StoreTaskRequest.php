@@ -1,6 +1,6 @@
 <?php
 
-namespace MeridienClube\Meridien\Http\Requests;
+namespace ConfrariaWeb\Task\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

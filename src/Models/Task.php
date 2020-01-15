@@ -5,15 +5,15 @@ namespace ConfrariaWeb\Task\Models;
 use ConfrariaWe\task\Scopes\TaskStatusCompletedScope;
 use ConfrariaWeb\Comment\Traits\CommentTrait;
 use ConfrariaWeb\Fullcalendar\Event;
+use ConfrariaWeb\Historic\Traits\HistoricTrait;
 use ConfrariaWeb\Fullcalendar\IdentifiableEvent;
+use ConfrariaWeb\Option\Traits\OptionTrait;
+use ConfrariaWe\task\Scopes\TaskUserScope;
 use Illuminate\Database\Eloquent\Model;
-use MeridienClube\Meridien\Scopes\TaskUserScope;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Session;
-use ConfrariaWeb\Historic\Traits\HistoricTrait;
-use ConfrariaWeb\Option\Traits\OptionTrait;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class Task extends Model implements IdentifiableEvent
@@ -30,7 +30,9 @@ class Task extends Model implements IdentifiableEvent
         'type_id',
         'user_id',
         'datetime',
-        'priority'
+        'priority',
+        'start',
+        'end'
     ];
 
     protected $dates = [
@@ -57,7 +59,8 @@ class Task extends Model implements IdentifiableEvent
      *
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -108,13 +111,14 @@ class Task extends Model implements IdentifiableEvent
         ];
     }
 
-
-
-
-
     public function status()
     {
-        return $this->belongsTo('ConfrariaWeb\Task\Models\TaskStatus');
+        return $this->belongsTo('ConfrariaWeb\Task\Models\TaskStatus', 'status_id');
+    }
+
+    public function steps()
+    {
+        return $this->belongsToMany('ConfrariaWeb\Task\Models\TaskStep', 'task_step', 'task_id', 'step_id');
     }
 
     public function type()
@@ -129,7 +133,7 @@ class Task extends Model implements IdentifiableEvent
 
     public function users()
     {
-        return $this->belongsToMany('App\User', 'users','task_id', 'user_id');
+        return $this->belongsToMany('App\User', 'users', 'task_id', 'user_id');
     }
 
     public function destinateds()
@@ -154,7 +158,7 @@ class Task extends Model implements IdentifiableEvent
                 '<i class="' . $this->type->icon . '"></i>' :
                 Str::substr($this->type->name, 0, 1),
             'description' => option($this, 'description', NULL),
-            'status' => $this->status->name,
+            'status' => $this->status->name ?? '',
             'priority' => $this->priority,
             'options' => $this->options,
             'optionsValues' => $this->optionsValues,
@@ -173,9 +177,9 @@ class Task extends Model implements IdentifiableEvent
             'time' => $this->datetime->format('h:m'),
             'created_at' => isset($this->created_at) ? $this->created_at->diffForHumans() : NULL,
             'updated_at' => isset($this->updated_at) ? $this->updated_at->diffForHumans() : NULL,
-            'closed' => ($this->type->closedStatus->id == $this->status_id),
-            'closedStatus' => $this->type->closedStatus->id,
-            'closedStatusName' => $this->type->closedStatus->name,
+            'closed' => isset($this->type->closedStatus) && ($this->type->closedStatus->id == $this->status_id),
+            'closedStatus' => $this->type->closedStatus->id?? NULL,
+            'closedStatusName' => $this->type->closedStatus->name?? NULL,
             'historics' => $this->historics,
             'comments' => $this->comments,
         ]);

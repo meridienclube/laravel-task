@@ -16,6 +16,8 @@ class TaskStep extends Model
         'name',
     ];
 
+    protected $table = 'task_steps';
+
     public function tasks()
     {
         return $this->belongsToMany('ConfrariaWeb\Task\Models\Task', 'task_step');

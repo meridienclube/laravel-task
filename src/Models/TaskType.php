@@ -12,6 +12,8 @@ class TaskType extends Model
     use HistoricTrait;
     use SoftDeletes;
 
+    protected $table = 'task_types';
+
     protected $fillable = [
         'name',
         'color',
@@ -22,7 +24,7 @@ class TaskType extends Model
 
     public function tasks()
     {
-        return $this->hasMany('ConfrariaWe\task\Models\Task', 'type_id');
+        return $this->hasMany('ConfrariaWeb\Task\Models\Task', 'task_id');
     }
 
     /**
@@ -31,7 +33,7 @@ class TaskType extends Model
      */
     public function closedStatus()
     {
-        return $this->belongsTo('ConfrariaWe\task\Models\Status', 'closed_status_id');
+        return $this->belongsTo('ConfrariaWeb\Task\Models\TaskStatus', 'closed_status_id');
     }
 
 }

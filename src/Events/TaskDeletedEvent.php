@@ -1,6 +1,6 @@
 <?php
 
-namespace MeridienClube\Meridien\Events;
+namespace ConfrariaWeb\Task\Events;
 
 use MeridienClube\Meridien\Historics\TaskDeletedHistoricContract;
 use MeridienClube\Meridien\Notifications\TaskDeletedNotification;

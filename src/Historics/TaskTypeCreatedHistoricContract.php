@@ -1,9 +1,8 @@
 <?php
 
+namespace ConfrariaWeb\Task\Historics;
 
-namespace MeridienClube\Meridien\Historics;
-
-use MeridienClube\Meridien\TaskType;
+use ConfrariaWeb\Task\Models\TaskType;
 use ConfrariaWeb\Historic\Contracts\HistoricContract;
 
 class TaskTypeCreatedHistoricContract implements HistoricContract

@@ -12,8 +12,10 @@ class TaskStatus extends Model
     use HistoricTrait;
     use SoftDeletes;
 
+    protected $table = 'task_statuses';
+
     protected $fillable = [
-        'name',
+        'name', 'slug', 'order', 'closure'
     ];
 
     public function tasks()

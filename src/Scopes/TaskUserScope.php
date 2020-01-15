@@ -20,7 +20,7 @@ class TaskUserScope implements Scope
         if (!app()->runningInConsole()) {
             if (!auth()->user()->isAdmin()) {
                 $builder
-                    ->whereIn('tasks.status_id', auth()->user()->roleTasksStatuses->pluck('id'))
+                    //->whereIn('tasks.status_id', auth()->user()->roleTasksStatuses->pluck('id'))
                     ->where('tasks.user_id', auth()->id())
                     ->orWhereHas('associates', function ($query) {
                         $query->where('users.id', auth()->id());

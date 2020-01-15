@@ -1,9 +1,9 @@
 <?php
 
-namespace MeridienClube\Meridien\Policies;
+namespace ConfrariaWeb\Task\Policies;
 
-use MeridienClube\Meridien\Task;
-use MeridienClube\Meridien\User;
+use App\User;
+use ConfrariaWeb\Task\Models\Task;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TaskPolicy
@@ -12,6 +12,7 @@ class TaskPolicy
 
     public function before($user, $ability)
     {
+
         if ($user->isAdmin()) {
             return true;
         }
@@ -37,13 +38,10 @@ class TaskPolicy
      */
     public function view(User $user, Task $task)
     {
-        return (
-            $user->id === $task->user_id ||
-            $task->destinateds->pluck('id')->search($user->id) !== false ||
-            $task->associates->pluck('id')->search($user->id) !== false ||
+        return true;
+        return $user->isAdmin() ||
             $task->responsibles->pluck('id')->search($user->id) !== false ||
-            $task->employees->pluck('id')->search($user->id) !== false
-        );
+            $user->id === $task->user_id;
     }
 
     /**
@@ -66,7 +64,9 @@ class TaskPolicy
      */
     public function update(User $user, Task $task)
     {
-        return ($task->responsibles->pluck('id')->search($user->id) !== false || $user->id === $task->user_id);
+        return $user->isAdmin() ||
+            $task->responsibles->pluck('id')->search($user->id) !== false ||
+            $user->id === $task->user_id;
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace MeridienClube\Meridien\Events;
+namespace ConfrariaWeb\Task\Events;
 
 use MeridienClube\Meridien\Historics\TaskCreatedHistoricContract;
 use MeridienClube\Meridien\Notifications\TaskCreatedNotification;

@@ -1,13 +1,11 @@
 <?php
 
+namespace ConfrariaWeb\Task\Historics;
 
-namespace MeridienClube\Meridien\Historics;
-
-use MeridienClube\Meridien\Comment;
-use MeridienClube\Meridien\Task;
+use ConfrariaWeb\Task\Models\Task;
 use ConfrariaWeb\Historic\Contracts\HistoricContract;
 
-class TaskCommentCreatedHistoricContract implements HistoricContract
+class TaskCommentCreatedHistoric implements HistoricContract
 {
 
     protected $comment;

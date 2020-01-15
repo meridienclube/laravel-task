@@ -14,21 +14,19 @@ use ConfrariaWeb\Task\Resources\UserResource;
 use ConfrariaWeb\Task\Services\TaskService;
 use Illuminate\Http\Request;
 
-use Illuminate\Support\LazyCollection;
-
 class TaskController extends Controller
 {
 
     protected $data;
 
-    public function __construct()
+    public function __construct(Request $request)
     {
         $this->data['types'] = resolve('TaskTypeService')->all();
-    }
-
-    public function index()
-    {
-        return view(config('cw_task.views') . 'tasks.index', $this->data);
+        $this->data['statuses'] = resolve('TaskStatusService')->all();
+        $this->data['destinateds'][] = isset($request->destinated_id)?
+            resolve('UserService')->find($request->destinated_id) :
+            [];
+        $this->data['responsibles'] = [];
     }
 
     public function calendar(TaskService $taskService)
@@ -66,19 +64,14 @@ class TaskController extends Controller
 
     }
 
-    public function create(Request $request)
+    public function index()
     {
-        $this->data['statuses'] = resolve('TaskStatusService')->all();
-        $taskemployees = ($request->taskemployees) ? $request->taskemployees : [Auth::user()->id];
-        $this->data['tasks'] = resolve('TaskService')->take(10)->where(['employees', $taskemployees])->get();
-        $this->data['types'] = resolve('TaskTypeService')->all();
-        $this->data['selecteds']['destinateds'] = [];
-        if (isset($request->destinated_id)) {
-            $destinateds = resolve('UserService')->find($request->destinated_id);
-            $this->data['selecteds']['destinateds'] = ($destinateds) ? $destinateds->pluck('name', 'id') : [];
-        }
-        $this->data['selecteds']['responsibles'] = [auth()->id() => auth()->user()->name];
+        return view(config('cw_task.views') . 'tasks.index', $this->data);
+    }
 
+    public function create()
+    {
+        $this->data['responsibles'][auth()->id()] = auth()->user()->name;
         return view(config('cw_task.views') . 'tasks.create', $this->data);
     }
 
@@ -90,10 +83,12 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
-        $task = resolve('TaskService')->create($request->all());
+        $data = $request->all();
+        $data['user_id'] = $data['user_id']?? auth()->id();
+        $task = resolve('TaskService')->create($data);
         return redirect()
             ->route('admin.tasks.edit', $task->id)
-            ->with('status', 'tarefa criada com sucesso!');
+            ->with('status', 'Tarefa criada com sucesso!');
     }
 
     /**
@@ -105,58 +100,22 @@ class TaskController extends Controller
      */
     public function show($id)
     {
-        $task = resolve('TaskService')->find($id);
-        abort_unless($task, 404);
-        $this->authorize('update', $task);
-        $this->data['task'] = $task;
-        $this->data['task_format'] = $task->format();
-        $this->data['breadcrumb'] = [
-            route('admin.tasks.index') => 'Lista de tarefas',
-            '#' => $this->data['task_format']['title']
-        ];
-        $this->data['buttons'] = [
-            route('admin.tasks.index') => ['label' => __('return'), 'icon' => 'flaticon2-back'],
-            route('admin.tasks.create') => ['label' => __('tasks.new'), 'icon' => 'fa fa-plus'],
-            'include' => 'tasks.partials.buttons'
-        ];
-        $this->data['tasks'] = resolve('TaskService')->all();
-        $this->data['types'] = resolve('TaskTypeService')->all();
-        $this->data['employees'] = resolve('UserService')->employees();
-        $this->data['associates'] = resolve('UserService')->associates();
-        return view('tasks.show', $this->data);
+        $this->data['task'] = resolve('TaskService')->find($id);
+        abort_unless($this->data['task'], 404);
+        $this->authorize('view', $this->data['task']);
+        $this->data['destinateds'] = $this->data['task']->destinateds?? $this->data['destinateds'];
+        $this->data['responsibles'] = $this->data['task']->responsibles?? $this->data['responsibles'];
+        return view(config('cw_task.views') . 'tasks.show', $this->data);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return \Illuminate\Response
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
     public function edit(Request $request, $id)
     {
-        $task = resolve('TaskService')->find($id);
-        abort_unless($task, 404);
-        $this->authorize('update', $task);
-        $this->data['task'] = $task;
-        $this->data['task_format'] = $task->format();
-        $this->data['breadcrumb'] = [
-            route('admin.tasks.index') => 'Lista de tarefas',
-            '#' => $this->data['task_format']['title']
-        ];
-        $this->data['buttons'] = [
-            route('admin.tasks.index') => ['label' => __('return'), 'icon' => 'flaticon2-back'],
-            route('admin.tasks.create') => ['label' => __('tasks.new'), 'icon' => 'fa fa-plus'],
-            route('admin.tasks.show', $task->id) => ['label' => __('tasks.show'), 'icon' => 'fa fa-show'],
-        ];
-        $this->data['statuses'] = Auth::user()->roleTasksStatuses;
-        $taskemployees = [];//isset($request->taskemployees)? $request->taskemployees : $task->employees->pluck('id');
-        $this->data['tasks'] = resolve('TaskService')->where(['employees', $taskemployees])->take(10)->get();
-        $this->data['types'] = resolve('TaskTypeService')->all();
-        $this->data['selecteds']['destinateds'] = isset($task) ? $task->destinateds->pluck('name', 'id') : [];
-        $this->data['selecteds']['responsibles'] = isset($task) ? $task->responsibles->pluck('name', 'id') : [auth()->user()->name, auth()->id()];
-        return view('tasks.edit', $this->data);
+        $this->data['task'] = resolve('TaskService')->find($id);
+        abort_unless($this->data['task'], 404);
+        $this->authorize('update', $this->data['task']);
+        $this->data['destinateds'] = $this->data['task']->destinateds->pluck('name', 'id')?? [];
+        $this->data['responsibles'] = $this->data['task']->responsibles->pluck('name', 'id')?? [auth()->id() => auth()->user()->name];
+        return view(config('cw_task.views') . 'tasks.edit', $this->data);
     }
 
     /**
@@ -248,35 +207,10 @@ class TaskController extends Controller
     public function datatable(Request $request)
     {
         $data = $request->all();
-
         $data['where'] = [];
-        if (isset($data['search']['value'])) {
-            $data['where']['name'] = $data['search']['value'];
-            $data['orWhere']['contacts']['phone'] = $data['search']['value'];
-            $data['orWhere']['contacts']['cellphone'] = $data['search']['value'];
-            $data['orWhere']['roles'][] = $data['search']['value'];
+        foreach ($data['columns'] as $column) {
+            $data['where'][$column['name']] = $column['search']['value'];
         }
-
-        if (isset($data['columns'][0]['search']['value'])) {
-            $data['where']['types'] = explode(',', $data['columns'][0]['search']['value']);
-        }
-
-        if (isset($data['columns'][1]['search']['value'])) {
-            $dataa = explode(',', $data['columns'][1]['search']['value']);
-            $data['where']['from'] = isset($dataa[0]) ? $dataa[0] : NULL;
-            $data['where']['to'] = isset($dataa[1]) ? $dataa[1] : NULL;
-        }
-
-        /*
-        if (isset($data['columns'][3]['search']['value']) && $data['columns'][3]['search']['value'] > 0) {
-            $data['where']['view_completed'] = 1;
-        }
-        */
-
-        if (isset($data['columns'][6]['search']['value'])) {
-            $data['where']['responsibles'] = explode(',', $data['columns'][6]['search']['value']);
-        }
-
         $datatable = resolve('TaskService')->datatable($data);
         return (TaskResource::collection($datatable['data']))
             ->additional([
