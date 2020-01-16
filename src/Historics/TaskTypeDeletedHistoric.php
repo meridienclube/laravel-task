@@ -5,7 +5,7 @@ namespace ConfrariaWeb\Task\Historics;
 use ConfrariaWeb\Task\Models\TaskType;
 use ConfrariaWeb\Historic\Contracts\HistoricContract;
 
-class TaskTypeCreatedHistoricContract implements HistoricContract
+class TaskTypeDeletedHistoric implements HistoricContract
 {
     protected $type;
 
@@ -17,14 +17,14 @@ class TaskTypeCreatedHistoricContract implements HistoricContract
     public function data()
     {
         return [
-            'action' => 'created',
-            'content' => 'Tipo de Tarefa ' . $this->type->name . ' criada com sucesso'
+            'action' => 'deleted',
+            'content' => 'Tipo de Tarefa ' . $this->type->name . ' deletada com sucesso'
         ];
     }
 
     public function title()
     {
-        return 'Tipo de Tarefa criada';
+        return 'Tipo de Tarefa deletada';
     }
 
     public function user($collunn = null)

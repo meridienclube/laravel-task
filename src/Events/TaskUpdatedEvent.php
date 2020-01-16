@@ -2,9 +2,9 @@
 
 namespace ConfrariaWeb\Task\Events;
 
-use MeridienClube\Meridien\Historics\TaskUpdatedHistoricContract;
-use MeridienClube\Meridien\Notifications\TaskUpdatedNotification;
-use MeridienClube\Meridien\Task;
+use ConfrariaWeb\Task\Historics\TaskUpdatedHistoric;
+use ConfrariaWeb\Task\Notifications\TaskUpdatedNotification;
+use ConfrariaWeb\Task\Models\Task;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -12,7 +12,6 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Support\Facades\Log;
 
 class TaskUpdatedEvent
 {
@@ -32,7 +31,7 @@ class TaskUpdatedEvent
     public function __construct(Task $task)
     {
         $this->obj = $task;
-        $this->historic = new TaskUpdatedHistoricContract($task);
+        $this->historic = new TaskUpdatedHistoric($task);
         $this->when = 'updated';
         $this->notification = new TaskUpdatedNotification($task);
         $this->users = $task->employees;

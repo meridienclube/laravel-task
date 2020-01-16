@@ -18,7 +18,21 @@ class TaskRepository implements TaskContract
 
     public function where(array $data = [], $take = null)
     {
-        //dd($data);
+
+        if (isset($data['search']['value'])) {
+            $this->obj = $this->obj->whereHas('type', function ($query) use ($data) {
+                $query->where('task_types.name', 'like', '%' . $data['search']['value'] . '%');
+            });
+            $this->obj = $this->obj->orWhereHas('status', function ($query) use ($data) {
+                $query->where('task_statuses.name', 'like', '%' . $data['search']['value'] . '%');
+            });
+            $this->obj = $this->obj->orWhereHas('destinateds', function ($query) use ($data) {
+                $query->where('users.name', 'like', '%' . $data['search']['value'] . '%');
+            });
+            $this->obj = $this->obj->orWhereHas('responsibles', function ($query) use ($data) {
+                $query->where('users.name', 'like', '%' . $data['search']['value'] . '%');
+            });
+        }
 
         if (isset($data['date'])) {
             $from = date("Y-m-d", strtotime(str_replace("/", "-", $data['date'])));

@@ -5,7 +5,7 @@ namespace ConfrariaWeb\Task\Historics;
 use ConfrariaWeb\Task\Models\Task;
 use ConfrariaWeb\Historic\Contracts\HistoricContract;
 
-class TaskUpdatedHistoricContract implements HistoricContract
+class TaskUpdatedHistoric implements HistoricContract
 {
     protected $task;
 

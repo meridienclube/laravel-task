@@ -34,6 +34,7 @@
         "laravel": {
             "providers": [
                 "ConfrariaWeb\\Task\\Providers\\TaskAuthServiceProvider",
+                "ConfrariaWeb\\Task\\Providers\\TaskEventServiceProvider",
                 "ConfrariaWeb\\Task\\Providers\\TaskServiceProvider"
             ]
         }

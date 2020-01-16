@@ -1,8 +1,8 @@
 <?php
 
-namespace MeridienClube\Meridien\Notifications;
+namespace ConfrariaWeb\Task\Notifications;
 
-use MeridienClube\Meridien\Task;
+use ConfrariaWeb\Task\Models\Task;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;

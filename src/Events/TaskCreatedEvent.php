@@ -2,9 +2,9 @@
 
 namespace ConfrariaWeb\Task\Events;
 
-use MeridienClube\Meridien\Historics\TaskCreatedHistoricContract;
-use MeridienClube\Meridien\Notifications\TaskCreatedNotification;
-use MeridienClube\Meridien\Task;
+use ConfrariaWeb\Task\Historics\TaskCreatedHistoric;
+use ConfrariaWeb\Task\Notifications\TaskCreatedNotification;
+use ConfrariaWeb\Task\Models\Task;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -31,7 +31,7 @@ class TaskCreatedEvent
     public function __construct(Task $task)
     {
         $this->obj = $task;
-        $this->historic = new TaskCreatedHistoricContract($task);
+        $this->historic = new TaskCreatedHistoric($task);
         $this->when = 'created';
         $this->users = $task->employees;
         $this->notification = new TaskCreatedNotification($task);

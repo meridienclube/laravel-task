@@ -23,7 +23,7 @@ class TaskController extends Controller
     {
         $this->data['types'] = resolve('TaskTypeService')->all();
         $this->data['statuses'] = resolve('TaskStatusService')->all();
-        $this->data['destinateds'][] = isset($request->destinated_id)?
+        $this->data['destinateds'][] = isset($request->destinated_id) ?
             resolve('UserService')->find($request->destinated_id) :
             [];
         $this->data['responsibles'] = [];
@@ -84,7 +84,7 @@ class TaskController extends Controller
     public function store(StoreTaskRequest $request)
     {
         $data = $request->all();
-        $data['user_id'] = $data['user_id']?? auth()->id();
+        $data['user_id'] = $data['user_id'] ?? auth()->id();
         $task = resolve('TaskService')->create($data);
         return redirect()
             ->route('admin.tasks.edit', $task->id)
@@ -103,8 +103,8 @@ class TaskController extends Controller
         $this->data['task'] = resolve('TaskService')->find($id);
         abort_unless($this->data['task'], 404);
         $this->authorize('view', $this->data['task']);
-        $this->data['destinateds'] = $this->data['task']->destinateds?? $this->data['destinateds'];
-        $this->data['responsibles'] = $this->data['task']->responsibles?? $this->data['responsibles'];
+        $this->data['destinateds'] = $this->data['task']->destinateds ?? $this->data['destinateds'];
+        $this->data['responsibles'] = $this->data['task']->responsibles ?? $this->data['responsibles'];
         return view(config('cw_task.views') . 'tasks.show', $this->data);
     }
 
@@ -113,8 +113,8 @@ class TaskController extends Controller
         $this->data['task'] = resolve('TaskService')->find($id);
         abort_unless($this->data['task'], 404);
         $this->authorize('update', $this->data['task']);
-        $this->data['destinateds'] = $this->data['task']->destinateds->pluck('name', 'id')?? [];
-        $this->data['responsibles'] = $this->data['task']->responsibles->pluck('name', 'id')?? [auth()->id() => auth()->user()->name];
+        $this->data['destinateds'] = $this->data['task']->destinateds->pluck('name', 'id') ?? [];
+        $this->data['responsibles'] = $this->data['task']->responsibles->pluck('name', 'id') ?? [auth()->id() => auth()->user()->name];
         return view(config('cw_task.views') . 'tasks.edit', $this->data);
     }
 
@@ -196,18 +196,13 @@ class TaskController extends Controller
                 ->with('danger', 'Para concluir a tarefa é necessário deixar um comentário!');
         }
         $close = resolve('TaskService')->close($id, $comment);
-        //return back()->withInput()
-        //->with('status', 'Tarefa atualizada com sucesso!');
-        /*return redirect()
-            ->route('admin.tasks.index')
-            ->with('status', 'Tarefa atualizada com sucesso!');*/
-        return redirect()->route('admin.tasks.index')->with('status', 'Tarefa atualizada com sucesso!');
+        return redirect()->route('admin.tasks.index')->with('status', 'Tarefa finalizada com sucesso!');
     }
 
     public function datatable(Request $request)
     {
         $data = $request->all();
-        $data['where'] = [];
+        $data['where']['search'] = $data['search'] ?? NULL;
         foreach ($data['columns'] as $column) {
             $data['where'][$column['name']] = $column['search']['value'];
         }
@@ -219,6 +214,5 @@ class TaskController extends Controller
                 'recordsFiltered' => $datatable['recordsFiltered']
             ]);
     }
-
 
 }
