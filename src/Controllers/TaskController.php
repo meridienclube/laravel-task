@@ -22,11 +22,73 @@ class TaskController extends Controller
     public function __construct(Request $request)
     {
         $this->data['types'] = resolve('TaskTypeService')->all();
+        $this->data['closure_status'] = resolve('TaskStatusService')->where(['closure' => 1])->first();
         $this->data['statuses'] = resolve('TaskStatusService')->all();
-        $this->data['destinateds'][] = isset($request->destinated_id) ?
-            resolve('UserService')->find($request->destinated_id) :
-            [];
+        $this->data['destinateds'] = [];
         $this->data['responsibles'] = [];
+        if (isset($request->destinated_id)) {
+            $destinated = resolve('UserService')->find($request->destinated_id);
+            $this->data['destinateds'][$destinated->id] = $destinated->name;
+        }
+    }
+
+    public function updateDate(Request $request)
+    {
+        $data['datetime'] = gmdate('Y-m-d H:i:s', strtotime($request->date));
+        return resolve('TaskService')->update($data, $request->task_id);
+    }
+
+    public function close(Request $request, $id)
+    {
+        $task = resolve('TaskService')->find($id);
+        abort_unless($task, 404);
+        $this->authorize('update', $task);
+        $comment = $request->comment;
+        if (!isset($comment)) {
+            return back()->withInput()
+                ->with('danger', 'Para concluir a tarefa é necessário deixar um comentário!');
+        }
+        $close = resolve('TaskService')->close($id, $comment);
+        return redirect()->route('admin.tasks.index')->with('status', 'Tarefa finalizada com sucesso!');
+    }
+
+    public function reschedule(Request $request, $id)
+    {
+        resolve('TaskService')->update($request->all(), $id);
+        return back()->withInput()
+            ->with('status', 'Tarefa atualizada com sucesso!');
+    }
+
+    public function updateStatus($id, $status_id)
+    {
+        $updateStatus = resolve('TaskService')->update(['status_id' => $status_id], $id);
+        return back()->withInput()
+            ->with('status', 'Status da tarefa atualizada com sucesso!');
+    }
+
+    public function storeComment(StoreTaskCommentRequest $request, $task_id)
+    {
+        $TaskService = resolve('TaskService')->createComment($request->all(), $task_id);
+        return redirect()
+            ->route('admin.tasks.show', $task_id)
+            ->with('status', 'Comentário criado com sucesso!');
+    }
+
+    public function datatable(Request $request)
+    {
+        $data = $request->all();
+
+        $data['where']['search'] = $data['search'] ?? NULL;
+        foreach ($data['columns'] as $column) {
+            $data['where'][$column['name']] = $column['search']['value'];
+        }
+        $datatable = resolve('TaskService')->datatable($data);
+        return (TaskResource::collection($datatable['data']))
+            ->additional([
+                'draw' => $datatable['draw'],
+                'recordsTotal' => $datatable['recordsTotal'],
+                'recordsFiltered' => $datatable['recordsFiltered']
+            ]);
     }
 
     public function calendar(TaskService $taskService)
@@ -75,12 +137,6 @@ class TaskController extends Controller
         return view(config('cw_task.views') . 'tasks.create', $this->data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Request $request
-     * @return \Illuminate\Response
-     */
     public function store(StoreTaskRequest $request)
     {
         $data = $request->all();
@@ -91,13 +147,6 @@ class TaskController extends Controller
             ->with('status', 'Tarefa criada com sucesso!');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Response
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
     public function show($id)
     {
         $this->data['task'] = resolve('TaskService')->find($id);
@@ -118,13 +167,6 @@ class TaskController extends Controller
         return view(config('cw_task.views') . 'tasks.edit', $this->data);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Request $request
-     * @param int $id
-     * @return \Illuminate\Response
-     */
     public function update(UpdateTaskRequest $request, $id)
     {
         $task = resolve('TaskService')->update($request->all(), $id);
@@ -133,86 +175,12 @@ class TaskController extends Controller
             ->with('status', 'Tarefa editado com sucesso!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return \Illuminate\Response
-     */
     public function destroy($id)
     {
         $task = resolve('TaskService')->destroy($id);
         return redirect()
             ->route('admin.tasks.index')
             ->with('status', 'Tarefa deletado com sucesso!');
-    }
-
-    /**
-     * @param StoreTaskCommentRequest $request
-     * @param $task_id
-     * @return \Illuminate\RedirectResponse
-     */
-    public function storeComment(StoreTaskCommentRequest $request, $task_id)
-    {
-        $TaskService = resolve('TaskService')->createComment($request->all(), $task_id);
-        return redirect()
-            ->route('admin.tasks.show', $task_id)
-            ->with('status', 'Comentário criado com sucesso!');
-    }
-
-    public function reschedule(Request $request, $id)
-    {
-        resolve('TaskService')->update($request->all(), $id);
-        return back()->withInput()
-            ->with('status', 'Tarefa atualizada com sucesso!');
-    }
-
-    public function updateStatus($id, $status_id)
-    {
-        $updateStatus = resolve('TaskService')->update(['status_id' => $status_id], $id);
-        return back()->withInput()
-            ->with('status', 'Status da tarefa atualizada com sucesso!');
-    }
-
-    public function updateDate(Request $request)
-    {
-        $data['datetime'] = gmdate('Y-m-d H:i:s', strtotime($request->date));
-        return resolve('TaskService')->update($data, $request->task_id);
-    }
-
-    /**
-     * @param $id - ID da tarefa
-     * @return \Illuminate\RedirectResponse|string
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function close(Request $request, $id)
-    {
-        $task = resolve('TaskService')->find($id);
-        abort_unless($task, 404);
-        $this->authorize('update', $task);
-        $comment = $request->comment;
-        if (!isset($comment)) {
-            return back()->withInput()
-                ->with('danger', 'Para concluir a tarefa é necessário deixar um comentário!');
-        }
-        $close = resolve('TaskService')->close($id, $comment);
-        return redirect()->route('admin.tasks.index')->with('status', 'Tarefa finalizada com sucesso!');
-    }
-
-    public function datatable(Request $request)
-    {
-        $data = $request->all();
-        $data['where']['search'] = $data['search'] ?? NULL;
-        foreach ($data['columns'] as $column) {
-            $data['where'][$column['name']] = $column['search']['value'];
-        }
-        $datatable = resolve('TaskService')->datatable($data);
-        return (TaskResource::collection($datatable['data']))
-            ->additional([
-                'draw' => $datatable['draw'],
-                'recordsTotal' => $datatable['recordsTotal'],
-                'recordsFiltered' => $datatable['recordsFiltered']
-            ]);
     }
 
 }

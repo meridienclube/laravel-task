@@ -18,7 +18,9 @@ class TaskUpdatedHistoric implements HistoricContract
     {
         return [
             'action' => 'updated',
-            'content' => 'Tarefa ' . $this->task->type->name . ' atualizada com sucesso'
+            'content' => 'Tarefa ' . $this->task->type->name . ' atualizada com sucesso',
+            'from' => [],
+            'to' => $this->task->getChanges(),
         ];
     }
 

@@ -2,13 +2,12 @@
 
 namespace ConfrariaWeb\Task\Models;
 
-use ConfrariaWe\task\Scopes\TaskStatusCompletedScope;
 use ConfrariaWeb\Comment\Traits\CommentTrait;
-use ConfrariaWeb\Fullcalendar\Event;
 use ConfrariaWeb\Historic\Traits\HistoricTrait;
 use ConfrariaWeb\Fullcalendar\IdentifiableEvent;
 use ConfrariaWeb\Option\Traits\OptionTrait;
-use ConfrariaWe\task\Scopes\TaskUserScope;
+use ConfrariaWeb\Task\Scopes\TaskStatusClosedScope;
+use ConfrariaWeb\Task\Scopes\TaskUserScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
@@ -49,8 +48,8 @@ class Task extends Model implements IdentifiableEvent
     protected static function boot()
     {
         parent::boot();
-        //static::addGlobalScope(new TaskUserScope);
-        //static::addGlobalScope(new TaskStatusCompletedScope);
+        static::addGlobalScope(new TaskUserScope);
+        static::addGlobalScope(new TaskStatusClosedScope);
     }
 
 
