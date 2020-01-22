@@ -28,14 +28,14 @@ class Task extends Model implements IdentifiableEvent
         'status_id',
         'type_id',
         'user_id',
-        'datetime',
+        //'datetime',
         'priority',
         'start',
         'end'
     ];
 
     protected $dates = [
-        'datetime',
+        //'datetime',
         'start',
         'end'
     ];

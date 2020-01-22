@@ -7,8 +7,8 @@ use App\Http\Controllers\Controller;
 use ConfrariaWeb\Fullcalendar\Calendar;
 use ConfrariaWeb\Task\Models\Task;
 use ConfrariaWeb\Task\Requests\StoreTaskCommentRequest;
-use ConfrariaWeb\Task\Requests\StoreTaskRequest;
-use ConfrariaWeb\Task\Requests\UpdateTaskRequest;
+use ConfrariaWeb\Task\Requests\StoreScheduleRequest;
+use ConfrariaWeb\Task\Requests\UpdateScheduleRequest;
 use ConfrariaWeb\Task\Resources\TaskResource;
 use ConfrariaWeb\Task\Resources\UserResource;
 use ConfrariaWeb\Task\Services\TaskService;
@@ -94,10 +94,10 @@ class TaskController extends Controller
     public function calendar(TaskService $taskService)
     {
         $events = [];
-        $tasks = Task::cursor();
+        //$tasks = Task::cursor();
+        $tasks = resolve('TaskService')->all();
 
         foreach ($tasks as $task) {
-
             $events[] = \ConfrariaWeb\Fullcalendar\Facades\Calendar::event(
                 $task->type->name, //event title
                 false, //full day event?
@@ -108,11 +108,9 @@ class TaskController extends Controller
                     'url' => route('admin.tasks.show', $task->id)
                 ]
             );
-
         }
         $eloquentEvent = Task::first();
-
-        $calendar = \ConfrariaWeb\Fullcalendar\Facades\Calendar::addEvents(Task::cursor())
+        $calendar = \ConfrariaWeb\Fullcalendar\Facades\Calendar::addEvents($events)
             ->addEvent($eloquentEvent, [
                 'color' => '#800',
                 'eventClick' => 'function() {alert("teste")}'
@@ -121,9 +119,7 @@ class TaskController extends Controller
             ])->setCallbacks([
                 'viewRender' => 'function() {}'
             ]);
-
         return view(config('cw_task.views') . 'tasks.calendar', compact('calendar'));
-
     }
 
     public function index()
@@ -137,7 +133,7 @@ class TaskController extends Controller
         return view(config('cw_task.views') . 'tasks.create', $this->data);
     }
 
-    public function store(StoreTaskRequest $request)
+    public function store(StoreScheduleRequest $request)
     {
         $data = $request->all();
         $data['user_id'] = $data['user_id'] ?? auth()->id();
@@ -167,7 +163,7 @@ class TaskController extends Controller
         return view(config('cw_task.views') . 'tasks.edit', $this->data);
     }
 
-    public function update(UpdateTaskRequest $request, $id)
+    public function update(UpdateScheduleRequest $request, $id)
     {
         $task = resolve('TaskService')->update($request->all(), $id);
         return redirect()

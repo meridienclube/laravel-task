@@ -2,7 +2,7 @@
 
 return [
     'layout' => env('CW_LAYOUT', 'layouts.app'),
-    'views' => env('CW_VIEWS', 'task::tasks.'),
+    'views' => env('CW_VIEWS', 'task::'),
     'priorities' => [
         5 => 'Muito alta',
         4 => 'Alta',

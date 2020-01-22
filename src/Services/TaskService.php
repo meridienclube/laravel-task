@@ -21,7 +21,7 @@ class TaskService
     function pluck()
     {
         return $this->obj->all()->map(function ($value, $key) {
-            $value->name = $value->type->name . ' - ' . $value->user->name . ' - ' . $value->datetime->format('d/m/Y');
+            $value->name = $value->type->name . ' - ' . $value->user->name . ' - ' . $value->start->format('d/m/Y');
             return $value;
         })->pluck('name', 'id');
     }
@@ -61,12 +61,12 @@ class TaskService
      */
     protected function prepareData($data)
     {
-        if (isset($data['datetime']) && is_array($data['datetime'])) {
+        if (isset($data['start']) && is_array($data['start'])) {
             $text_convert = ['dia' => 'day', 'dias' => 'days', 'mes' => 'month', 'meses' => 'months'];
             $carbon = new Carbon();
             $datetime = $carbon->toDateTimeString();
-            $date = isset($data['datetime']['date']) ? trim($data['datetime']['date']) : null;
-            $time = isset($data['datetime']['time']) ? trim($data['datetime']['time']) : null;
+            $date = isset($data['start']['date']) ? trim($data['start']['date']) : null;
+            $time = isset($data['start']['time']) ? trim($data['start']['time']) : null;
 
             if ($time) {
                 $time = explode(':', $time);
@@ -80,27 +80,27 @@ class TaskService
                 $hour = isset($time[0]) ? $time[0] : 0;
                 $minute = isset($time[1]) ? $time[1] : 0;
                 if ($pos_contrabarra !== false) {
-                    $date = explode('/', $data['datetime']['date']);
+                    $date = explode('/', $data['start']['date']);
                     $day = $date[0];
                     $month = $date[1];
                     $year = $date[2];
                     $datetime = $carbon->create($year, $month, $day, $hour, $minute)->toDateTimeString();
                 } elseif ($pos_traco !== false) {
-                    $date = explode('-', $data['datetime']['date']);
+                    $date = explode('-', $data['start']['date']);
                     $day = $date[2];
                     $month = $date[1];
                     $year = $date[0];
                     $datetime = $carbon->create($year, $month, $day, $hour, $minute)->toDateTimeString();
                 } elseif ($pos_carbon !== false) {
-                    $date = explode(' ', $data['datetime']['date']);
+                    $date = explode(' ', $data['start']['date']);
                     $period = array_key_exists($date[2], $text_convert) ? $text_convert[$date[2]] : $date[2];
                     $datetime = $carbon->add($date[1] . ' ' . $period)->toDateTimeString();
                 }
-            } else if (isset($data['datetime']) && !is_array($data['datetime'])) {
-                $datetime = $data['datetime'];
+            } else if (isset($data['start']) && !is_array($data['start'])) {
+                $datetime = $data['start'];
             }
 
-            $data['datetime'] = $datetime;
+            $data['start'] = $datetime;
         }
         return $data;
     }

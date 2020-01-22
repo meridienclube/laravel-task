@@ -1,6 +1,6 @@
 <?php
 
-namespace MeridienClube\Meridien\Jobs;
+namespace ConfrariaWeb\Task\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
