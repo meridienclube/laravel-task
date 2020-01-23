@@ -171,9 +171,9 @@ class Task extends Model implements IdentifiableEvent
                 'responsibles' => $this->responsibles->implode('name', ', ')
             ],
             'employees' => $this->employees,
-            'datetime' => $this->datetime->format('d/m/Y'),
-            'date' => $this->datetime->format('d/m/Y'),
-            'time' => $this->datetime->format('h:m'),
+            'datetime' => $this->start->format('d/m/Y'),
+            'date' => $this->start->format('d/m/Y'),
+            'time' => $this->start->format('h:m'),
             'created_at' => isset($this->created_at) ? $this->created_at->diffForHumans() : NULL,
             'updated_at' => isset($this->updated_at) ? $this->updated_at->diffForHumans() : NULL,
             'closed' => isset($this->type->closedStatus) && ($this->type->closedStatus->id == $this->status_id),

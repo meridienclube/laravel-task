@@ -1,21 +1,28 @@
-<div class="kt-portlet" id="kt_portlet">
-    <div class="kt-portlet__head">
-        <div class="kt-portlet__head-label">
-					<span class="kt-portlet__head-icon">
-						<i class="flaticon-map-location"></i>
-					</span>
-            <h3 class="kt-portlet__head-title">
-                {{ $title ?? trans('meridien.calendar') }}
-            </h3>
-        </div>
-    </div>
-    <div class="kt-portlet__body">
-        <div id="kt_calendar"></div>
-    </div>
+<div class="task-calendar">
+    <h3>
+        <a href="?ym={{ $prev }}">&lt;</a>
+        {{ $title?? 'Calendar' }}
+        <a href="?ym={{ $next }}">&gt;</a>
+    </h3>
+    <table class="table table-bordered">
+        <tr>
+            <th scope="col">D</th>
+            <th scope="col">S</th>
+            <th scope="col">T</th>
+            <th scope="col">Q</th>
+            <th scope="col">Q</th>
+            <th scope="col">S</th>
+            <th scope="col">S</th>
+        </tr>
+        <?php
+        foreach ($weeks as $week) {
+            echo $week;
+        }
+        ?>
+    </table>
 </div>
 
-<div class="modal fade" id="kt_modal_calendar" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="kt_modal_calendar" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -25,9 +32,9 @@
             </div>
             <div class="modal-body">
                 <div id="calendarModalBodyDate">Date Calendar</div>
-                <div id="calendarModalBodyContent">Content Calendar</div>
-                <div id="calendarModalBodyEmployees">Employees Calendar</div>
-                <div id="calendarModalBodyDestinateds">Destinateds Calendar</div>
+                <!--div id="calendarModalBodyContent">Content Calendar</div-->
+                <!--div id="calendarModalBodyEmployees">Employees Calendar</div-->
+                <!--div id="calendarModalBodyDestinateds">Destinateds Calendar</div-->
             </div>
             <div class="modal-footer">
                 <a href="" class="btn btn-info" id="calendarModalButtonView">Ver</a>
@@ -39,137 +46,106 @@
     </div>
 </div>
 
+@push('styles')
+    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"-->
+    <!--link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet"-->
+    <style>
+
+        .task-calendar table {
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .task-calendar table td, th {
+            /*border: 1px solid black;*/
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .task-calendar h3 {
+            margin-bottom: 30px;
+        }
+
+        .task-calendar th {
+            height: 30px;
+            text-align: center;
+        }
+
+        .task-calendar td {
+            height: 120px;
+        }
+
+        .task-calendar .today {
+            background: orange;
+        }
+
+        .task-calendar th:nth-of-type(1), td:nth-of-type(1) {
+            color: red;
+        }
+
+        .task-calendar th:nth-of-type(7), td:nth-of-type(7) {
+            color: blue;
+        }
+
+        .task-calendar span.span_day {
+            background: #463f3f;
+            padding: 2px;
+            font-size: 12px;
+            margin: 0;
+            height: 22px;
+            width: 22px;
+            text-align: center;
+            display: block;
+            color: #fff;
+            float: right;
+            border-radius: 10px;
+        }
+
+        .task-calendar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 50%;
+            float: left;
+        }
+
+        .task-calendar ul li {
+
+        }
+
+        .task-calendar ul li a {
+            font-size: 10px;
+            display: block;
+            color: #fff;
+            padding: 2px 4px;
+            font-weight: 800;
+            border-radius: 6px;
+            margin-bottom: 2px;
+        }
+    </style>
+@endpush
+
 @push('scripts')
     <script>
-        "use strict";
-        var KTCalendarBasic = {
-            init: function () {
-                var e = moment().startOf("day"),
-                    t = e.format("YYYY-MM"),
-                    i = e.clone().subtract(1, "day").format("YYYY-MM-DD"),
-                    n = e.format("YYYY-MM-DD"),
-                    r = e.clone().add(1, "day").format("YYYY-MM-DD"),
-                    o = document.getElementById("kt_calendar");
-                new FullCalendar.Calendar(o, {
-                        locale: 'pt-br',
-                        timeZone: 'America/Sao_Paulo',
-                        plugins: ["interaction", "dayGrid", "timeGrid", "list"],
-                        isRTL: KTUtil.isRTL(),
-                        header: {
-                            left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay"
-                        },
-                        height: 800,
-                        contentHeight: 780,
-                        aspectRatio: 3,
-                        nowIndicator: !0,
-                        now: n + "T09:25:00",
-                        views: {
-                            dayGridMonth: {
-                                buttonText: "Mês"
-                            }
-                            , timeGridWeek: {
-                                buttonText: "Semana"
-                            }
-                            , timeGridDay: {
-                                buttonText: "Dia"
-                            }
-                        },
-                        businessHours: {
-                            daysOfWeek: [1, 2, 3, 4, 5],
-                            startTime: '08:00',
-                            endTime: '18:00',
-                        },
-                        buttonText: {
-                            next: '>',
-                            nextYear: '>>',
-                            prev: '<',
-                            prevYear: '<<',
-                            today: "Hoje",
-                            month: 'Mês',
-                            week: 'Semana',
-                            day: 'Dia',
-                            list: 'Lista'
-                        },
-                        defaultView: "dayGridMonth",
-                        defaultDate: n,
-                        editable: !0,
-                        eventLimit: !0,
-                        navLinks: !0,
+        $('a.task_link').on('click', function () {
+            const task = JSON.parse($(this).attr('data-task'));
+            const type = JSON.parse($(this).attr('data-task-type'));
+            console.log(task)
+            console.log(type)
 
-                        events: function (info, successCallback, failureCallback) {
-                            $.ajax({
-                                dataType: "json",
-                                type: "GET",
-                                url: "{{ url('api/tasks/calendar?api_token=' . auth()->user()->api_token) }}",
-                                success: function (obj) {
-                                    successCallback(obj.data);
-                                }
-                            });
-                        },
+            $('#kt_modal_calendar #calendarModalLabel').html(type.name);
 
-                        eventDrop: function (info) {
-                            if (confirm("Você tem certeza sobre essa mudança? ")) {
-                                $.post("{{ route('admin.tasks.update.date') }}",
-                                    {
-                                        task_id: info.event.extendedProps.task_id,
-                                        date: info.event.start.toUTCString()
-                                    },
-                                    function (data, status) {
-                                        if ('success' !== status) {
-                                            info.revert();
-                                        }
-                                    }
-                                );
-                            } else {
-                                info.revert();
-                            }
-                        },
+            $('#kt_modal_calendar #calendarModalBodyDate').html('Tarefa criada ' + task.created_at + ' e a previsão de entrega é ' + task.end);
+            //$('#kt_modal_calendar #calendarModalBodyContent').html(task.name);
 
-                        eventResize: function (info) {
-                            //alert(info.event.title + " end is now " + info.event.end.toISOString());
-                            if (!confirm("Você tem certeza sobre essa mudança?")) {
-                                info.revert();
-                            }
-                        },
+            //$('#kt_modal_calendar #calendarModalBodyEmployees').html('Responsavel da tarefa: <b>' + responsibles + '</b>');
+            //$('#kt_modal_calendar #calendarModalBodyDestinateds').html('Destinatário da tarefa: <b>' + destinateds + '</b>');
 
-                        eventClick: function (info) {
-                            info.jsEvent.preventDefault();
+            $('#kt_modal_calendar #calendarModalButtonView').attr('href', '/admin/tasks/' + task.id);
+            $('#kt_modal_calendar #calendarModalButtonEdit').attr('href', '/admin/tasks/' + task.id + '/edit');
+            $('#kt_modal_calendar #calendarModalButtonClose').attr('href', '/admin/tasks/' + task.id + '/close');
 
-                            var destinateds = $.map(info.event.extendedProps.destinateds, function (n, i) {
-                                return n.name;
-                            }).join(', ');
-
-                            var responsibles = $.map(info.event.extendedProps.responsibles, function (n, i) {
-                                return n.name;
-                            }).join(', ');
-
-                            $('#kt_modal_calendar #calendarModalLabel').html(info.event.title);
-
-                            $('#kt_modal_calendar #calendarModalBodyDate').html('Tarefa criada ' + info.event.extendedProps.created_at + ' e a previsão de entrega é ' + info.event.extendedProps.datetime);
-                            $('#kt_modal_calendar #calendarModalBodyContent').html(info.event.extendedProps.description);
-
-                            $('#kt_modal_calendar #calendarModalBodyEmployees').html('Responsavel da tarefa: <b>' + responsibles + '</b>');
-                            $('#kt_modal_calendar #calendarModalBodyDestinateds').html('Destinatário da tarefa: <b>' + destinateds + '</b>');
-
-                            $('#kt_modal_calendar #calendarModalButtonView').attr('href', '/tasks/' + info.event.extendedProps.task_id);
-                            $('#kt_modal_calendar #calendarModalButtonEdit').attr('href', '/tasks/' + info.event.extendedProps.task_id + '/edit');
-                            $('#kt_modal_calendar #calendarModalButtonClose').attr('href', '/tasks/' + info.event.extendedProps.task_id + '/close');
-
-                            $('#kt_modal_calendar').modal();
-                        }
-                        /*
-                        ,
-                        eventRender: function (e) {
-                            var t = $(e.el);
-                            e.event.extendedProps && e.event.extendedProps.description && (t.hasClass("fc-day-grid-event") ? (t.data("content", e.event.extendedProps.description), t.data("placement", "top"), KTApp.initPopover(t)) : t.hasClass("fc-time-grid-event") ? t.find(".fc-title").append('<div class="fc-description">' + e.event.extendedProps.description + "</div>") : 0 !== t.find(".fc-list-item-title").lenght && t.find(".fc-list-item-title").append('<div class="fc-description">' + e.event.extendedProps.description + "</div>"))
-                        }
-                        */
-                    }
-                ).render()
-            }
-        };
-        jQuery(document).ready(function () {
-            KTCalendarBasic.init()
+            $('#kt_modal_calendar').modal();
         });
     </script>
 @endpush

@@ -83,7 +83,7 @@ class TaskRepository implements TaskContract
         }
 
         if (isset($data['order'])) {
-            $this->obj = $this->orderBy($this->obj, $data['order']);
+            $this->obj = $this->obj->orderBy($this->obj, $data['order']);
         }
 
         return $this;

@@ -91,35 +91,43 @@ class TaskController extends Controller
             ]);
     }
 
-    public function calendar(TaskService $taskService)
-    {
-        $events = [];
-        //$tasks = Task::cursor();
-        $tasks = resolve('TaskService')->all();
+    /*
+        public function calendar(TaskService $taskService)
+        {
+            $events = [];
+            //$tasks = Task::cursor();
+            $tasks = resolve('TaskService')->all();
 
-        foreach ($tasks as $task) {
-            $events[] = \ConfrariaWeb\Fullcalendar\Facades\Calendar::event(
-                $task->type->name, //event title
-                false, //full day event?
-                $task->start, //start time (you can also use Carbon instead of DateTime)
-                $task->end, //end time (you can also use Carbon instead of DateTime)
-                $task->id, //optional event ID
-                [
-                    'url' => route('admin.tasks.show', $task->id)
-                ]
-            );
+            foreach ($tasks as $task) {
+                $events[] = \ConfrariaWeb\Fullcalendar\Facades\Calendar::event(
+                    $task->type->name, //event title
+                    false, //full day event?
+                    $task->start, //start time (you can also use Carbon instead of DateTime)
+                    $task->end, //end time (you can also use Carbon instead of DateTime)
+                    $task->id, //optional event ID
+                    [
+                        'url' => route('admin.tasks.show', $task->id)
+                    ]
+                );
+            }
+            $eloquentEvent = Task::first();
+            $calendar = \ConfrariaWeb\Fullcalendar\Facades\Calendar::addEvents($events)
+                ->addEvent($eloquentEvent, [
+                    'color' => '#800',
+                    'eventClick' => 'function() {alert("teste")}'
+                ])->setOptions([
+                    'firstDay' => 1
+                ])->setCallbacks([
+                    'viewRender' => 'function() {}'
+                ]);
+            return view(config('cw_task.views') . 'tasks.calendar', compact('calendar'));
         }
-        $eloquentEvent = Task::first();
-        $calendar = \ConfrariaWeb\Fullcalendar\Facades\Calendar::addEvents($events)
-            ->addEvent($eloquentEvent, [
-                'color' => '#800',
-                'eventClick' => 'function() {alert("teste")}'
-            ])->setOptions([
-                'firstDay' => 1
-            ])->setCallbacks([
-                'viewRender' => 'function() {}'
-            ]);
-        return view(config('cw_task.views') . 'tasks.calendar', compact('calendar'));
+    */
+
+    public function calendar(Request $request)
+    {
+        $this->data['calendar'] = resolve('TaskService')->calendar($request->all());
+        return view(config('cw_task.views') . 'tasks.calendar', $this->data);
     }
 
     public function index()
