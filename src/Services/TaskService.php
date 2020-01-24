@@ -3,10 +3,9 @@
 namespace ConfrariaWeb\Task\Services;
 
 use ConfrariaWeb\Task\Contracts\TaskContract;
-use Auth;
 use Carbon\Carbon;
+use ConfrariaWeb\Task\Resources\TaskResource;
 use Illuminate\Support\Facades\Log;
-use Validator;
 use ConfrariaWeb\Vendor\Traits\ServiceTrait;
 
 class TaskService
@@ -61,6 +60,9 @@ class TaskService
      */
     protected function prepareData($data)
     {
+        //dd($data['start']);
+        //dd(Carbon::parse($data['start'])->toDateString()); //format('Y-m-d H:i:s'));
+
         if (isset($data['start']) && is_array($data['start'])) {
             $text_convert = ['dia' => 'day', 'dias' => 'days', 'mes' => 'month', 'meses' => 'months'];
             $carbon = new Carbon();
@@ -147,15 +149,15 @@ class TaskService
             $tasksDay = $tasks->whereBetween('start', [$tasksDayFrom, $tasksDayTo]);
             $date = $ym . '-' . $day;
             if ($today == $date) {
-                $week .= "<td class='today' scope='row'><span class='span_day'>" . $day . "</span>";
+                $week .= "<td class='today' scope='row' class='bg-warning'><span class='span_day bg-info text-white'>" . $day . "</span>";
             } else {
-                $week .= "<td scope='row'><span class='span_day'>" . $day . "</span>";
+                $week .= "<td scope='row'><span class='span_day bg-info text-white'>" . $day . "</span>";
             }
 
             //$week .= "<span>(" . $tasksDay->count() . ")</span>";
             $week .= "<ul>";
             foreach ($tasksDay as $taskDay){
-                $week .= "<li><a data-task-type='" . $taskDay->type . "' data-task='" . $taskDay . "' href='javascript:void(0)' style='background:" . $taskDay->type->color . "' class='task_link'>" . $taskDay->type->name . "</a></li>";
+                $week .= "<li><a data-task='" . $taskDay->format() . "' href='javascript:void(0)' style='background:" . $taskDay->type->color . "' class='task_link'>" . $taskDay->type->name . "</a></li>";
             }
             $week .= "</ul>";
             $week .= "</td>";

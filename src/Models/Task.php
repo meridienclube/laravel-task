@@ -4,7 +4,6 @@ namespace ConfrariaWeb\Task\Models;
 
 use ConfrariaWeb\Comment\Traits\CommentTrait;
 use ConfrariaWeb\Historic\Traits\HistoricTrait;
-use ConfrariaWeb\Fullcalendar\IdentifiableEvent;
 use ConfrariaWeb\Option\Traits\OptionTrait;
 use ConfrariaWeb\Task\Scopes\TaskStatusClosedScope;
 use ConfrariaWeb\Task\Scopes\TaskUserScope;
@@ -15,7 +14,7 @@ use Illuminate\Support\Str;
 use Session;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
-class Task extends Model implements IdentifiableEvent
+class Task extends Model
 {
     use CommentTrait;
     use HistoricTrait;
@@ -40,74 +39,11 @@ class Task extends Model implements IdentifiableEvent
         'end'
     ];
 
-    /**
-     * The "booting" method of the model.
-     *
-     * @return void
-     */
     protected static function boot()
     {
         parent::boot();
         static::addGlobalScope(new TaskUserScope);
         static::addGlobalScope(new TaskStatusClosedScope);
-    }
-
-
-    /**
-     * Get the event's id number
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Get the event's title
-     *
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
-     * Is it an all day event?
-     *
-     * @return bool
-     */
-    public function isAllDay()
-    {
-        return (bool)$this->all_day;
-    }
-
-    /**
-     * Get the start time
-     *
-     * @return DateTime
-     */
-    public function getStart()
-    {
-        return $this->start;
-    }
-
-    /**
-     * Get the end time
-     *
-     * @return DateTime
-     */
-    public function getEnd()
-    {
-        return $this->end;
-    }
-
-    public function getEventOptions()
-    {
-        return [
-            'color' => $this->type->color,
-        ];
     }
 
     public function status()
@@ -165,7 +101,11 @@ class Task extends Model implements IdentifiableEvent
                 'name' => $this->user->name,
                 'email' => $this->user->email,
             ],
-            'destinateds' => $this->destinateds,
+            'destinateds' => $this->destinateds->map(function ($item, $key) {
+                $item->optionsValues = $item->optionsValues;
+                $item->contact = $item->contacts;
+                return $item;
+            }),
             'implode' => [
                 'destinateds' => $this->destinateds->implode('name', ', '),
                 'responsibles' => $this->responsibles->implode('name', ', ')
@@ -174,8 +114,12 @@ class Task extends Model implements IdentifiableEvent
             'datetime' => $this->start->format('d/m/Y'),
             'date' => $this->start->format('d/m/Y'),
             'time' => $this->start->format('h:m'),
-            'created_at' => isset($this->created_at) ? $this->created_at->diffForHumans() : NULL,
-            'updated_at' => isset($this->updated_at) ? $this->updated_at->diffForHumans() : NULL,
+            'start' => isset($this->start) ? $this->start->diffForHumans() : NULL,
+            'end' => isset($this->end) ? $this->end->diffForHumans() : NULL,
+            'created' => isset($this->created_at) ? $this->created_at->diffForHumans() : NULL,
+            'created_at' => isset($this->created_at) ? $this->created_at : NULL,
+            'updated' => isset($this->updated_at) ? $this->updated_at->diffForHumans() : NULL,
+            'updated_at' => isset($this->updated_at) ? $this->updated_at : NULL,
             'closed' => isset($this->type->closedStatus) && ($this->type->closedStatus->id == $this->status_id),
             'closedStatus' => $this->type->closedStatus->id?? NULL,
             'closedStatusName' => $this->type->closedStatus->name?? NULL,

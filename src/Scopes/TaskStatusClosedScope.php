@@ -17,13 +17,14 @@ class TaskStatusClosedScope implements Scope
                 ->where(['closure' => 1])
                 ->get()
                 ->pluck('id');
+            $builder->whereNotIn('tasks.status_id', $ids);
             //$view_completed = request('columns.3.search.value', 0);
-            $view_completed = false;
-            $builder->when($view_completed, function ($query) use($ids) {
+            //$view_completed = false;
+            //$builder->when($view_completed, function ($query) use($ids) {
                 //return $query->whereNotIn('tasks.status_id', $ids);
-            }, function ($query) use($ids) {
-                return $query->whereNotIn('tasks.status_id', $ids);
-            });
+            //}, function ($query) use($ids) {
+                //return $query->whereNotIn('tasks.status_id', $ids);
+            //});
         }
     }
 }

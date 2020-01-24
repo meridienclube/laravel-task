@@ -1,28 +1,43 @@
-<div class="task-calendar">
-    <h3>
-        <a href="?ym={{ $prev }}">&lt;</a>
-        {{ $title?? 'Calendar' }}
-        <a href="?ym={{ $next }}">&gt;</a>
-    </h3>
-    <table class="table table-bordered">
-        <tr>
-            <th scope="col">D</th>
-            <th scope="col">S</th>
-            <th scope="col">T</th>
-            <th scope="col">Q</th>
-            <th scope="col">Q</th>
-            <th scope="col">S</th>
-            <th scope="col">S</th>
-        </tr>
-        <?php
-        foreach ($weeks as $week) {
-            echo $week;
-        }
-        ?>
-    </table>
+<div class="task-calendar container-fluid">
+    <div class="row mb-4">
+        <div class="col-6">
+            <div class="btn-group float-left" role="group" aria-label="">
+                <a href="?ym={{ $prev }}" class="btn btn-primary btn-sm">&lt;</a>
+                <button class="btn btn-secondary btn-sm">{{ $title?? 'Calendar' }}</button>
+                <a href="?ym={{ $next }}" class="btn btn-primary btn-sm">&gt;</a>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="btn-group float-right" role="group" aria-label="">
+                <a href="{{ route('admin.tasks.calendar') }}" class="btn btn-secondary btn-sm">{{ __('month') }}</a>
+                <!--button type="button" class="btn btn-secondary btn-sm">{{ __('week') }}</button-->
+                <!--button type="button" class="btn btn-secondary btn-sm">{{ __('day') }}</button-->
+                <a href="{{ route('admin.tasks.index') }}" class="btn btn-secondary btn-sm">{{ __('list') }}</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-bordered">
+                <tr>
+                    <th scope="col">D</th>
+                    <th scope="col">S</th>
+                    <th scope="col">T</th>
+                    <th scope="col">Q</th>
+                    <th scope="col">Q</th>
+                    <th scope="col">S</th>
+                    <th scope="col">S</th>
+                </tr>
+                @foreach ($weeks as $week)
+                    {!! $week !!}
+                @endforeach
+            </table>
+        </div>
+    </div>
 </div>
 
-<div class="modal fade" id="kt_modal_calendar" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
+<div class="modal fade" id="kt_modal_calendar" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -34,7 +49,7 @@
                 <div id="calendarModalBodyDate">Date Calendar</div>
                 <!--div id="calendarModalBodyContent">Content Calendar</div-->
                 <!--div id="calendarModalBodyEmployees">Employees Calendar</div-->
-                <!--div id="calendarModalBodyDestinateds">Destinateds Calendar</div-->
+                <div id="calendarModalBodyDestinateds">Destinateds Calendar</div>
             </div>
             <div class="modal-footer">
                 <a href="" class="btn btn-info" id="calendarModalButtonView">Ver</a>
@@ -76,9 +91,9 @@
         }
 
         .task-calendar .today {
-            background: orange;
+            /*background: orange;*/
         }
-
+/*
         .task-calendar th:nth-of-type(1), td:nth-of-type(1) {
             color: red;
         }
@@ -86,9 +101,9 @@
         .task-calendar th:nth-of-type(7), td:nth-of-type(7) {
             color: blue;
         }
-
+*/
         .task-calendar span.span_day {
-            background: #463f3f;
+            /*background: #463f3f;*/
             padding: 2px;
             font-size: 12px;
             margin: 0;
@@ -96,7 +111,7 @@
             width: 22px;
             text-align: center;
             display: block;
-            color: #fff;
+            /*color: #fff;*/
             float: right;
             border-radius: 10px;
         }
@@ -128,23 +143,24 @@
 @push('scripts')
     <script>
         $('a.task_link').on('click', function () {
-            const task = JSON.parse($(this).attr('data-task'));
-            const type = JSON.parse($(this).attr('data-task-type'));
-            console.log(task)
-            console.log(type)
-
-            $('#kt_modal_calendar #calendarModalLabel').html(type.name);
-
-            $('#kt_modal_calendar #calendarModalBodyDate').html('Tarefa criada ' + task.created_at + ' e a previsão de entrega é ' + task.end);
+            let task = JSON.parse($(this).attr('data-task'));
+            //console.log(task)
+            $('#kt_modal_calendar #calendarModalLabel').html(task.title);
+            $('#kt_modal_calendar #calendarModalBodyDate').html('Tarefa criada ' + task.start + ' e a previsão de entrega é ' + task.end);
             //$('#kt_modal_calendar #calendarModalBodyContent').html(task.name);
-
+            $('#kt_modal_calendar #calendarModalBodyDestinateds').html('<b>Destinatários da tarefa</b>: <br>');
+            $.each(task.destinateds, function( index, value ) {
+                //console.log(value)
+                let contacts = '(' + $.map(value.contacts, function(e){
+                    return e.content;
+                }).join(' ') + ')';
+                $( "#kt_modal_calendar #calendarModalBodyDestinateds" ).append( value.name + contacts + '<br>' );
+            });
             //$('#kt_modal_calendar #calendarModalBodyEmployees').html('Responsavel da tarefa: <b>' + responsibles + '</b>');
             //$('#kt_modal_calendar #calendarModalBodyDestinateds').html('Destinatário da tarefa: <b>' + destinateds + '</b>');
-
             $('#kt_modal_calendar #calendarModalButtonView').attr('href', '/admin/tasks/' + task.id);
             $('#kt_modal_calendar #calendarModalButtonEdit').attr('href', '/admin/tasks/' + task.id + '/edit');
             $('#kt_modal_calendar #calendarModalButtonClose').attr('href', '/admin/tasks/' + task.id + '/close');
-
             $('#kt_modal_calendar').modal();
         });
     </script>

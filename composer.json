@@ -16,6 +16,7 @@
     ],
     "require": {
         "confrariaweb/laravel-comment": "dev-master",
+        "confrariaweb/laravel-datetimepicker": "dev-master",
         "confrariaweb/laravel-entrust": "dev-master",
         "confrariaweb/laravel-historic": "dev-master",
         "confrariaweb/laravel-modal": "dev-master",

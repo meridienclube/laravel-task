@@ -8,7 +8,9 @@ use ConfrariaWeb\Fullcalendar\Calendar;
 use ConfrariaWeb\Task\Models\Task;
 use ConfrariaWeb\Task\Requests\StoreTaskCommentRequest;
 use ConfrariaWeb\Task\Requests\StoreScheduleRequest;
+use ConfrariaWeb\Task\Requests\StoreTaskRequest;
 use ConfrariaWeb\Task\Requests\UpdateScheduleRequest;
+use ConfrariaWeb\Task\Requests\UpdateTaskRequest;
 use ConfrariaWeb\Task\Resources\TaskResource;
 use ConfrariaWeb\Task\Resources\UserResource;
 use ConfrariaWeb\Task\Services\TaskService;
@@ -141,7 +143,7 @@ class TaskController extends Controller
         return view(config('cw_task.views') . 'tasks.create', $this->data);
     }
 
-    public function store(StoreScheduleRequest $request)
+    public function store(StoreTaskRequest $request)
     {
         $data = $request->all();
         $data['user_id'] = $data['user_id'] ?? auth()->id();
@@ -171,7 +173,7 @@ class TaskController extends Controller
         return view(config('cw_task.views') . 'tasks.edit', $this->data);
     }
 
-    public function update(UpdateScheduleRequest $request, $id)
+    public function update(UpdateTaskRequest $request, $id)
     {
         $task = resolve('TaskService')->update($request->all(), $id);
         return redirect()
