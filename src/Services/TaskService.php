@@ -60,9 +60,36 @@ class TaskService
      */
     protected function prepareData($data)
     {
-        //dd($data['start']);
-        //dd(Carbon::parse($data['start'])->toDateString()); //format('Y-m-d H:i:s'));
+        $formatsDates = [
+            'd/m/Y H:i',
+            'd/m/Y H:i:s',
+            'Y-m-d H:i',
+            'Y-m-d H:i:s'
+        ];
 
+        foreach($formatsDates as $dateFormat){
+            if(isset($data['start']) && $this->validateDate($data['start'], $dateFormat)){
+                $data['start'] = \DateTime::createFromFormat($dateFormat, $data['start'])
+                    ->format('Y-m-d H:i:s');
+            }
+            if(isset($data['end']) && $this->validateDate($data['end'], $dateFormat)){
+                $data['end'] = \DateTime::createFromFormat($dateFormat, $data['end'])
+                    ->format('Y-m-d H:i:s');
+            }
+        }
+
+        if(!isset($data['start']) || !$this->validateDate($data['start'])){
+            $data['start'] = date('Y-m-d H:i:s');
+        }
+
+        if(!isset($data['end']) || !$this->validateDate($data['start'])){
+            $data['end'] = date('Y-m-d H:i:s');
+        }
+
+        //dd(\DateTime::createFromFormat('d/m/Y H:i', $data['start'])->format('Y-m-d H:i:s'));
+        //dd($this->validateDate($data['start'], 'd/m/Y H:i'));
+        //dd(Carbon::parse($data['start'])->toDateString()); //format('Y-m-d H:i:s'));
+/*
         if (isset($data['start']) && is_array($data['start'])) {
             $text_convert = ['dia' => 'day', 'dias' => 'days', 'mes' => 'month', 'meses' => 'months'];
             $carbon = new Carbon();
@@ -104,9 +131,24 @@ class TaskService
 
             $data['start'] = $datetime;
         }
+
+        //$this->validateMysqlDate($data['start']);
+*/
         return $data;
     }
 
+
+
+    /*
+    protected function validateMysqlDate( $date ){
+        if (preg_match("/^(\d{4})-(\d{2})-(\d{2}) ([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/", $date, $matches)) {
+            if (checkdate($matches[2], $matches[3], $matches[1])) {
+                return true;
+            }
+        }
+        return false;
+    }
+*/
     public function calendar($data)
     {
         //$from = '2020-01-20 00:00:00';

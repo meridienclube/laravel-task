@@ -18,7 +18,7 @@ class TaskRepository implements TaskContract
 
     public function where(array $data = [], $take = null)
     {
-
+;
         if (isset($data['search']['value'])) {
             $this->obj = $this->obj->whereHas('type', function ($query) use ($data) {
                 $query->where('task_types.name', 'like', '%' . $data['search']['value'] . '%');
@@ -33,19 +33,19 @@ class TaskRepository implements TaskContract
                 $query->where('users.name', 'like', '%' . $data['search']['value'] . '%');
             });
         }
-
+/*
         if (isset($data['date'])) {
             $from = date("Y-m-d", strtotime(str_replace("/", "-", $data['date'])));
             $to = date("Y-m-d", strtotime("+1 day", strtotime(str_replace("/", "-", $data['date']))));
             $this->obj = $this->obj->whereBetween('datetime', [$from, $to]);
         }
-/*
-        if (isset($data['from']) && isset($data['to'])) {
-            $from = date("Y-m-d", strtotime(str_replace("/", "-", $data['from'])));
-            $to = date("Y-m-d", strtotime("+1 day", strtotime(str_replace("/", "-", $data['to']))));
-            $this->obj = $this->obj->whereBetween('datetime', [$from, $to]);
-        }
 */
+        if (isset($data['start']) && isset($data['end'])) {
+            $this->obj = $this->obj
+                ->whereDate('start', '>=', $data['start'])
+                ->whereDate('end', '<=', $data['end']);
+        }
+
         if (isset($data['type_id'])) {
             $this->obj = $this->obj->where('type_id', $data['type_id']);
         }
@@ -81,7 +81,7 @@ class TaskRepository implements TaskContract
                 $query->whereIn('users.id', $data['responsibles']);
             });
         }
-
+        //dd($this->obj->toSql());
         if (isset($data['order'])) {
             $this->obj = $this->obj->orderBy($this->obj, $data['order']);
         }

@@ -79,11 +79,23 @@ class TaskController extends Controller
     public function datatable(Request $request)
     {
         $data = $request->all();
-
+        $data['where'] = array();
+        if(isset($data['data'])) {
+            parse_str($data['data'], $data['where']);
+        }
+        /*Tratamento para datetimepicker*/
+        if(isset($data['where']['start']) && $data['where']['start'] == '__/__/____ __:__'){
+            unset($data['where']['start']);
+        }
+        if(isset($data['where']['end']) && $data['where']['end'] == '__/__/____ __:__'){
+            unset($data['where']['end']);
+        }
         $data['where']['search'] = $data['search'] ?? NULL;
+        /*
         foreach ($data['columns'] as $column) {
             $data['where'][$column['name']] = $column['search']['value'];
         }
+        */
         $datatable = resolve('TaskService')->datatable($data);
         return (TaskResource::collection($datatable['data']))
             ->additional([
@@ -129,16 +141,22 @@ class TaskController extends Controller
     public function calendar(Request $request)
     {
         $this->data['calendar'] = resolve('TaskService')->calendar($request->all());
+        //dd($this->data['calendar']);
         return view(config('cw_task.views') . 'tasks.calendar', $this->data);
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $all = $request->all();
+        //dd($request->responsibles);
+        $this->data['responsibles'] = ($request->responsibles) ? resolve('UserService')->whereIn('id', $request->responsibles)->get() : NULL;
+        //dd($this->data['responsibles']->pluck('name', 'id'));
         return view(config('cw_task.views') . 'tasks.index', $this->data);
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        $this->data['calendar'] = resolve('TaskService')->calendar($request->all());
         $this->data['responsibles'][auth()->id()] = auth()->user()->name;
         return view(config('cw_task.views') . 'tasks.create', $this->data);
     }
@@ -165,6 +183,7 @@ class TaskController extends Controller
 
     public function edit(Request $request, $id)
     {
+        $this->data['calendar'] = resolve('TaskService')->calendar($request->all());
         $this->data['task'] = resolve('TaskService')->find($id);
         abort_unless($this->data['task'], 404);
         $this->authorize('update', $this->data['task']);
