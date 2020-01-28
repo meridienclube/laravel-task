@@ -156,6 +156,22 @@ class TaskService
         //$tasks = $this->obj->whereBetween('start', '2020-01-01', '2020-01-31')->get();
         //dd($tasks->whereBetween('start', [$from, $to]));
 
+        $data['day'] = $data['day']?? date('Y-m-d');
+        //$yesterday_day = date('Y-m-d', strtotime("-1 day", $data['day']));
+        //$tomorrow_day = date('d-m-Y', strtotime("+1 day", $data['day']));
+
+        $data['day_tasks'] = resolve('TaskService')
+            ->whereDate('start', $data['day'])->get();
+        //dd($data['day']);
+        //dd($data['day_tasks']);
+
+        $monday_this_week = date('Y-m-d H:i:s', strtotime('monday this week'));
+        $friday_this_week= date('Y-m-d H:i:s', strtotime('friday this week'));
+
+        $data['week_tasks'] = resolve('TaskService')
+            ->whereBetween('start', $monday_this_week, $friday_this_week)->get();
+        //dd($data['week_tasks'][0]->type);
+
         $ym = $data['ym']?? NULL;
         if (!isset($ym)) {
             $ym = date('Y-m');
@@ -166,7 +182,7 @@ class TaskService
             $timestamp = strtotime($ym . '-01');
         }
         $today = date('Y-m-j', time());
-        $data['html_title'] = date('Y / m', $timestamp);
+        $data['title'] = date('Y / m', $timestamp);
         $data['prev'] = date('Y-m', mktime(0, 0, 0, date('m', $timestamp) - 1, 1, date('Y', $timestamp)));
         $data['next'] = date('Y-m', mktime(0, 0, 0, date('m', $timestamp) + 1, 1, date('Y', $timestamp)));
         // $prev = date('Y-m', strtotime('-1 month', $timestamp));
