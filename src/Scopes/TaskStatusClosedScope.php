@@ -18,6 +18,7 @@ class TaskStatusClosedScope implements Scope
                 ->get()
                 ->pluck('id');
             $builder->whereNotIn('tasks.status_id', $ids);
+
             //$view_completed = request('columns.3.search.value', 0);
             //$view_completed = false;
             //$builder->when($view_completed, function ($query) use($ids) {

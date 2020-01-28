@@ -106,6 +106,13 @@ class Task extends Model
                 $item->contact = $item->contacts;
                 return $item;
             }),
+
+            'responsibles' => $this->responsibles->map(function ($item, $key) {
+                $item->optionsValues = $item->optionsValues;
+                $item->contact = $item->contacts;
+                return $item;
+            }),
+
             'implode' => [
                 'destinateds' => $this->destinateds->implode('name', ', '),
                 'responsibles' => $this->responsibles->implode('name', ', ')

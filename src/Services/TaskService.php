@@ -36,10 +36,11 @@ class TaskService
             if (!$task->type->closedStatus) {
                 return false;
             }
+            $this->createComment('Tarefa concluida: ' . $comment, $id);
             $updateStatus = resolve('TaskService')
                 ->update(['status_id' => $task->type->closedStatus->id], $id);
             if ($updateStatus) {
-                $this->createComment('Tarefa concluida: ' . $comment, $id);
+
                 return true;
             }
         } catch (Exception $e) {

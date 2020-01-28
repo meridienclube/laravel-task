@@ -18,7 +18,9 @@ Route::prefix('admin')
                 Route::post('update/date', 'TaskController@updateDate')->name('update.date');
                 Route::get('update/date', 'TaskController@updateDate')->name('update.date');
                 Route::get('types/trashed', 'TaskTypeController@trashed')->name('types.trashed');
-                Route::match(['get', 'post'], '{id}/close', 'TaskController@close')->name('close');
+                //Route::match(['get', 'post'], '{id}/close', 'TaskController@close');
+                //Route::match(['get', 'post'], 'close/{id}', 'TaskController@close')->name('close');
+                Route::post('close/{id}', 'TaskController@close')->name('close');
                 Route::resource('types', 'TaskTypeController');
 
                 Route::name('steps.')
