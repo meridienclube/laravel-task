@@ -152,83 +152,74 @@ class TaskService
 */
     public function calendar($data)
     {
-        //$from = '2020-01-20 00:00:00';
-        //$to = '2020-01-21 11:59:59';
-        //$tasks = $this->obj->whereBetween('start', '2020-01-01', '2020-01-31')->get();
-        //dd($tasks->whereBetween('start', [$from, $to]));
+        $data['format'] = $data['f']?? 'month';
+        $data['day'] = isset($data['d'])? date('Y-m-d', strtotime($data['d'])) : date('Y-m-d');
+        $data['title'] = date('d/m/Y', strtotime($data['day']));
 
-        $data['day'] = $data['day']?? date('Y-m-d');
-        //$yesterday_day = date('Y-m-d', strtotime("-1 day", $data['day']));
-        //$tomorrow_day = date('d-m-Y', strtotime("+1 day", $data['day']));
+        if(isset($data['f']) && $data['f'] == 'day') {
+            $data['prev'] = date('Y-m-d', strtotime($data['day'] . "-1 days"));
+            $data['next'] = date('Y-m-d', strtotime($data['day'] . "+1 days"));
+            $data['tasks'] = resolve('TaskService')->whereDate('start', $data['day'])->get();
 
-        $data['day_tasks'] = resolve('TaskService')
-            ->whereDate('start', $data['day'])->get();
-        //dd($data['day']);
-        //dd($data['day_tasks']);
+        }else if(isset($data['f']) && $data['f'] == 'week') {
+            $data['prev'] = date('Y-m-d', strtotime($data['day'] . "-7 days"));
+            $data['next'] = date('Y-m-d', strtotime($data['day'] . "+7 days"));
+            $data['days_of_the_week'] = [];
+            $this_weeks = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+            foreach ($this_weeks as $this_week) {
+                $data['days_of_the_week'][] = date('Y-m-d H:i:s', strtotime($this_week . ' this week'));
+            }
+            $monday_this_week = date('Y-m-d H:i:s', strtotime('monday this week'));
+            $friday_this_week = date('Y-m-d H:i:s', strtotime('friday this week'));
+            $data['tasks'] = resolve('TaskService')->whereBetween('start', $monday_this_week, $friday_this_week)->get();
 
-        $monday_this_week = date('Y-m-d H:i:s', strtotime('monday this week'));
-        $friday_this_week= date('Y-m-d H:i:s', strtotime('friday this week'));
-
-        $data['week_tasks'] = resolve('TaskService')
-            ->whereBetween('start', $monday_this_week, $friday_this_week)->get();
-        //dd($data['week_tasks'][0]->type);
-
-        $ym = $data['ym']?? NULL;
-        if (!isset($ym)) {
-            $ym = date('Y-m');
-        }
-        $timestamp = strtotime($ym . '-01');
-        if ($timestamp === false) {
-            $ym = date('Y-m');
+        }else {
+            $ym = date('Y-m', strtotime($data['day']));
             $timestamp = strtotime($ym . '-01');
-        }
-        $today = date('Y-m-j', time());
-        $data['title'] = date('Y / m', $timestamp);
-        $data['prev'] = date('Y-m', mktime(0, 0, 0, date('m', $timestamp) - 1, 1, date('Y', $timestamp)));
-        $data['next'] = date('Y-m', mktime(0, 0, 0, date('m', $timestamp) + 1, 1, date('Y', $timestamp)));
-        // $prev = date('Y-m', strtotime('-1 month', $timestamp));
-        // $next = date('Y-m', strtotime('+1 month', $timestamp));
-        $day_count = date('t', $timestamp);
-        $str = date('w', mktime(0, 0, 0, date('m', $timestamp), 1, date('Y', $timestamp)));
-        //$str = date('w', $timestamp);
-
-        $tasksFrom = $ym. '-01';
-        $tasksTo = $ym . '-' . $day_count;
-        $tasks = $this->obj->whereBetween('start', $tasksFrom, $tasksTo)->get();
-        //dd($tasks);
-
-        // Create Calendar!!
-        $data['weeks'] = array();
-        $week = '';
-        $week .= str_repeat('<td></td>', $str);
-        for ($day = 1; $day <= $day_count; $day++, $str++) {
-            $tasksDayFrom = $ym . '-' . str_pad($day , 2 , '0' , STR_PAD_LEFT) . ' 00:00:00';
-            $tasksDayTo = $ym . '-' . str_pad($day , 2 , '0' , STR_PAD_LEFT) . ' 11:59:59';
-            //dd($tasksDayFrom);
-            $tasksDay = $tasks->whereBetween('start', [$tasksDayFrom, $tasksDayTo]);
-            $date = $ym . '-' . $day;
-            if ($today == $date) {
-                $week .= "<td class='today' scope='row' class='bg-warning'><span class='span_day bg-info text-white'>" . $day . "</span>";
-            } else {
-                $week .= "<td scope='row'><span class='span_day bg-info text-white'>" . $day . "</span>";
+            if ($timestamp === false) {
+                $ym = date('Y-m');
+                $timestamp = strtotime($ym . '-01');
             }
-
-            //$week .= "<span>(" . $tasksDay->count() . ")</span>";
-            $week .= "<ul>";
-            foreach ($tasksDay as $taskDay){
-                $week .= "<li><a data-task='" . $taskDay->format() . "' href='javascript:void(0)' style='background:" . $taskDay->type->color . "' class='task_link'>" . $taskDay->type->name . "</a></li>";
-            }
-            $week .= "</ul>";
-            $week .= "</td>";
-            if ($str % 7 == 6 || $day == $day_count) {
-                if ($day == $day_count) {
-                    $week .= str_repeat('<td></td>', 6 - ($str % 7));
+            $today = date('Y-m-j', time());
+            $data['title'] = date('m/Y', $timestamp);
+            $data['prev'] = date('Y-m', mktime(0, 0, 0, date('m', $timestamp) - 1, 1, date('Y', $timestamp)));
+            $data['next'] = date('Y-m', mktime(0, 0, 0, date('m', $timestamp) + 1, 1, date('Y', $timestamp)));
+            $day_count = date('t', $timestamp);
+            $str = date('w', mktime(0, 0, 0, date('m', $timestamp), 1, date('Y', $timestamp)));
+            $tasksFrom = $ym . '-01';
+            $tasksTo = $ym . '-' . $day_count;
+            $tasks = $this->obj->whereBetween('start', $tasksFrom, $tasksTo)->get();
+            $data['weeks'] = array();
+            $week = '';
+            $week .= str_repeat('<td></td>', $str);
+            for ($day = 1; $day <= $day_count; $day++, $str++) {
+                $tasksDayFrom = $ym . '-' . str_pad($day, 2, '0', STR_PAD_LEFT) . ' 00:00:00';
+                $tasksDayTo = $ym . '-' . str_pad($day, 2, '0', STR_PAD_LEFT) . ' 11:59:59';
+                //dd($tasksDayFrom);
+                $tasksDay = $tasks->whereBetween('start', [$tasksDayFrom, $tasksDayTo]);
+                $date = $ym . '-' . $day;
+                if ($today == $date) {
+                    $week .= "<td class='today' scope='row' class='bg-warning'><span class='span_day bg-info text-white'>" . $day . "</span>";
+                } else {
+                    $week .= "<td scope='row'><span class='span_day bg-info text-white'>" . $day . "</span>";
                 }
-                $count = 0;
-                $data['weeks'][] = '<tr>' . $week . '</tr>';
-                $week = '';
+                $week .= "<ul>";
+                foreach ($tasksDay as $taskDay) {
+                    $week .= "<li><a data-task='" . $taskDay->format() . "' href='javascript:void(0)' style='background:" . $taskDay->type->color . "' class='task_link'>" . $taskDay->type->name . "</a></li>";
+                }
+                $week .= "</ul>";
+                $week .= "</td>";
+                if ($str % 7 == 6 || $day == $day_count) {
+                    if ($day == $day_count) {
+                        $week .= str_repeat('<td></td>', 6 - ($str % 7));
+                    }
+                    $count = 0;
+                    $data['weeks'][] = '<tr>' . $week . '</tr>';
+                    $week = '';
+                }
             }
         }
+
         return $data;
     }
 

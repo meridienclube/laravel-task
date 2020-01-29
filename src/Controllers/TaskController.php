@@ -141,7 +141,6 @@ class TaskController extends Controller
     public function calendar(Request $request)
     {
         $this->data['calendar'] = resolve('TaskService')->calendar($request->all());
-        //dd($this->data['calendar']);
         return view(config('cw_task.views') . 'tasks.calendar', $this->data);
     }
 
