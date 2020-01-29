@@ -3,9 +3,9 @@
         <th scope="col">Data</th>
         <th scope="col" >Tarefas</th>
     </tr>
-    @foreach($days_of_the_week as $day_this_week)
+    @foreach($days_of_the_week as $day_k_week => $day_this_week)
         <tr>
-            <td>{{ date('d/m/Y', strtotime($day_this_week)) }}</td>
+            <td><!-- {{ __($day_k_week) }} - -->{{ date('d/m/Y', strtotime($day_this_week)) }}</td>
             <td >
                 @foreach($tasks as $taskweek)
                     @if($taskweek->start->format('d') == date('d', strtotime($day_this_week)))

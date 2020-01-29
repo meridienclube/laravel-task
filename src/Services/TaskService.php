@@ -155,6 +155,13 @@ class TaskService
         $data['format'] = $data['f']?? 'month';
         $data['day'] = isset($data['d'])? date('Y-m-d', strtotime($data['d'])) : date('Y-m-d');
         $data['title'] = date('d/m/Y', strtotime($data['day']));
+        //$diferencadias = strtotime($data['day']) - strtotime("now");
+        //$diferencadias = ($diferencadias < 0)? $diferencadias * -1 : $diferencadias;
+
+        /*dd(
+            date('Y-m-d H:i:s', strtotime($data['day'])),
+            date('Y-m-d H:i:s', strtotime('monday this week', strtotime($data['day'])))
+        );*/
 
         if(isset($data['f']) && $data['f'] == 'day') {
             $data['prev'] = date('Y-m-d', strtotime($data['day'] . "-1 days"));
@@ -165,9 +172,9 @@ class TaskService
             $data['prev'] = date('Y-m-d', strtotime($data['day'] . "-7 days"));
             $data['next'] = date('Y-m-d', strtotime($data['day'] . "+7 days"));
             $data['days_of_the_week'] = [];
-            $this_weeks = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+            $this_weeks = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
             foreach ($this_weeks as $this_week) {
-                $data['days_of_the_week'][] = date('Y-m-d H:i:s', strtotime($this_week . ' this week'));
+                $data['days_of_the_week'][$this_week] = date('Y-m-d H:i:s', strtotime($this_week . ' this week', strtotime($data['day'])));
             }
             $monday_this_week = date('Y-m-d H:i:s', strtotime('monday this week'));
             $friday_this_week = date('Y-m-d H:i:s', strtotime('friday this week'));
