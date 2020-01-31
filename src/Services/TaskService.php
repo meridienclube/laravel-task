@@ -68,76 +68,51 @@ class TaskService
             'Y-m-d H:i:s'
         ];
 
-        foreach($formatsDates as $dateFormat){
-            if(isset($data['start']) && $this->validateDate($data['start'], $dateFormat)){
+        foreach ($formatsDates as $dateFormat) {
+            if (isset($data['start']) && $this->validateDate($data['start'], $dateFormat)) {
                 $data['start'] = \DateTime::createFromFormat($dateFormat, $data['start'])
                     ->format('Y-m-d H:i:s');
             }
-            if(isset($data['end']) && $this->validateDate($data['end'], $dateFormat)){
+            if (isset($data['end']) && $this->validateDate($data['end'], $dateFormat)) {
                 $data['end'] = \DateTime::createFromFormat($dateFormat, $data['end'])
                     ->format('Y-m-d H:i:s');
             }
         }
 
-        if(!isset($data['start']) || !$this->validateDate($data['start'])){
+        if (!isset($data['start']) && !isset($data['end']) && isset($data['datetime'])) {
+            $text_convert = [
+                'minuto' => 'minute',
+                'minutos' => 'minutes',
+                'hora' => 'hour',
+                'horas' => 'hours',
+                'dia' => 'day',
+                'dias' => 'days',
+                'mes' => 'month',
+                'meses' => 'months',
+                'ano' => 'year',
+                'anos' => 'years'
+            ];
+            $carbon = new Carbon();
+            $pos_carbon = strpos($data['datetime'], '+');
+            if ($pos_carbon !== false) {
+                $date = explode(' ', $data['datetime']);
+                $period = array_key_exists($date[2], $text_convert) ? $text_convert[$date[2]] : $date[2];
+                $data['start'] = $carbon->add($date[1] . ' ' . $period)->toDateTimeString();
+                $data['end'] = $carbon->add($date[1] . ' ' . $period)->addMinutes(30)->toDateTimeString();
+            }
+
+        }
+
+        if (!isset($data['start']) || !$this->validateDate($data['start'])) {
             $data['start'] = date('Y-m-d H:i:s');
         }
 
-        if(!isset($data['end']) || !$this->validateDate($data['start'])){
+        if (!isset($data['end']) || !$this->validateDate($data['start'])) {
             $data['end'] = date('Y-m-d H:i:s');
         }
 
-        //dd(\DateTime::createFromFormat('d/m/Y H:i', $data['start'])->format('Y-m-d H:i:s'));
-        //dd($this->validateDate($data['start'], 'd/m/Y H:i'));
-        //dd(Carbon::parse($data['start'])->toDateString()); //format('Y-m-d H:i:s'));
-/*
-        if (isset($data['start']) && is_array($data['start'])) {
-            $text_convert = ['dia' => 'day', 'dias' => 'days', 'mes' => 'month', 'meses' => 'months'];
-            $carbon = new Carbon();
-            $datetime = $carbon->toDateTimeString();
-            $date = isset($data['start']['date']) ? trim($data['start']['date']) : null;
-            $time = isset($data['start']['time']) ? trim($data['start']['time']) : null;
-
-            if ($time) {
-                $time = explode(':', $time);
-            }
-
-            if ($date) {
-                $pos_contrabarra = strpos($date, '/');
-                $pos_traco = strpos($date, '/');
-                $pos_carbon = strpos($date, '+');
-
-                $hour = isset($time[0]) ? $time[0] : 0;
-                $minute = isset($time[1]) ? $time[1] : 0;
-                if ($pos_contrabarra !== false) {
-                    $date = explode('/', $data['start']['date']);
-                    $day = $date[0];
-                    $month = $date[1];
-                    $year = $date[2];
-                    $datetime = $carbon->create($year, $month, $day, $hour, $minute)->toDateTimeString();
-                } elseif ($pos_traco !== false) {
-                    $date = explode('-', $data['start']['date']);
-                    $day = $date[2];
-                    $month = $date[1];
-                    $year = $date[0];
-                    $datetime = $carbon->create($year, $month, $day, $hour, $minute)->toDateTimeString();
-                } elseif ($pos_carbon !== false) {
-                    $date = explode(' ', $data['start']['date']);
-                    $period = array_key_exists($date[2], $text_convert) ? $text_convert[$date[2]] : $date[2];
-                    $datetime = $carbon->add($date[1] . ' ' . $period)->toDateTimeString();
-                }
-            } else if (isset($data['start']) && !is_array($data['start'])) {
-                $datetime = $data['start'];
-            }
-
-            $data['start'] = $datetime;
-        }
-
-        //$this->validateMysqlDate($data['start']);
-*/
         return $data;
     }
-
 
 
     /*
@@ -152,8 +127,8 @@ class TaskService
 */
     public function calendar($data)
     {
-        $data['format'] = $data['f']?? 'month';
-        $data['day'] = isset($data['d'])? date('Y-m-d', strtotime($data['d'])) : date('Y-m-d');
+        $data['format'] = $data['f'] ?? 'month';
+        $data['day'] = isset($data['d']) ? date('Y-m-d', strtotime($data['d'])) : date('Y-m-d');
         $data['title'] = date('d/m/Y', strtotime($data['day']));
         //$diferencadias = strtotime($data['day']) - strtotime("now");
         //$diferencadias = ($diferencadias < 0)? $diferencadias * -1 : $diferencadias;
@@ -163,12 +138,12 @@ class TaskService
             date('Y-m-d H:i:s', strtotime('monday this week', strtotime($data['day'])))
         );*/
 
-        if(isset($data['f']) && $data['f'] == 'day') {
+        if (isset($data['f']) && $data['f'] == 'day') {
             $data['prev'] = date('Y-m-d', strtotime($data['day'] . "-1 days"));
             $data['next'] = date('Y-m-d', strtotime($data['day'] . "+1 days"));
             $data['tasks'] = resolve('TaskService')->whereDate('start', $data['day'])->get();
 
-        }else if(isset($data['f']) && $data['f'] == 'week') {
+        } else if (isset($data['f']) && $data['f'] == 'week') {
             $data['prev'] = date('Y-m-d', strtotime($data['day'] . "-7 days"));
             $data['next'] = date('Y-m-d', strtotime($data['day'] . "+7 days"));
             $data['days_of_the_week'] = [];
@@ -180,7 +155,7 @@ class TaskService
             $friday_this_week = date('Y-m-d H:i:s', strtotime('friday this week'));
             $data['tasks'] = resolve('TaskService')->whereBetween('start', $monday_this_week, $friday_this_week)->get();
 
-        }else {
+        } else {
             $ym = date('Y-m', strtotime($data['day']));
             $timestamp = strtotime($ym . '-01');
             if ($timestamp === false) {

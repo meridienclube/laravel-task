@@ -13,6 +13,7 @@ use ConfrariaWeb\Task\Requests\UpdateScheduleRequest;
 use ConfrariaWeb\Task\Requests\UpdateTaskRequest;
 use ConfrariaWeb\Task\Resources\TaskResource;
 use ConfrariaWeb\Task\Resources\UserResource;
+use ConfrariaWeb\Task\Scopes\TaskStatusClosedScope;
 use ConfrariaWeb\Task\Services\TaskService;
 use Illuminate\Http\Request;
 
@@ -83,6 +84,9 @@ class TaskController extends Controller
         if(isset($data['data'])) {
             parse_str($data['data'], $data['where']);
         }
+        if(isset($data['where']['see_completed'])){
+            $data['without_scopes'][] = '\ConfrariaWeb\Task\Scope\TaskStatusClosedScope::class';
+        }
         /*Tratamento para datetimepicker*/
         if(isset($data['where']['start']) && $data['where']['start'] == '__/__/____ __:__'){
             unset($data['where']['start']);
@@ -91,11 +95,14 @@ class TaskController extends Controller
             unset($data['where']['end']);
         }
         $data['where']['search'] = $data['search'] ?? NULL;
+
+
         /*
         foreach ($data['columns'] as $column) {
             $data['where'][$column['name']] = $column['search']['value'];
         }
         */
+
         $datatable = resolve('TaskService')->datatable($data);
         return (TaskResource::collection($datatable['data']))
             ->additional([

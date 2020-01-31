@@ -4,6 +4,7 @@ namespace ConfrariaWeb\Task\Repositories;
 
 use ConfrariaWeb\Task\Contracts\TaskContract;
 use ConfrariaWeb\Task\Models\Task;
+use ConfrariaWeb\Task\Scopes\TaskStatusClosedScope;
 use ConfrariaWeb\Vendor\Traits\RepositoryTrait;
 
 class TaskRepository implements TaskContract
@@ -18,7 +19,6 @@ class TaskRepository implements TaskContract
 
     public function where(array $data = [], $take = null)
     {
-;
         if (isset($data['search']['value'])) {
             $this->obj = $this->obj->whereHas('type', function ($query) use ($data) {
                 $query->where('task_types.name', 'like', '%' . $data['search']['value'] . '%');
@@ -33,13 +33,13 @@ class TaskRepository implements TaskContract
                 $query->where('users.name', 'like', '%' . $data['search']['value'] . '%');
             });
         }
-/*
-        if (isset($data['date'])) {
-            $from = date("Y-m-d", strtotime(str_replace("/", "-", $data['date'])));
-            $to = date("Y-m-d", strtotime("+1 day", strtotime(str_replace("/", "-", $data['date']))));
-            $this->obj = $this->obj->whereBetween('datetime', [$from, $to]);
-        }
-*/
+        /*
+                if (isset($data['date'])) {
+                    $from = date("Y-m-d", strtotime(str_replace("/", "-", $data['date'])));
+                    $to = date("Y-m-d", strtotime("+1 day", strtotime(str_replace("/", "-", $data['date']))));
+                    $this->obj = $this->obj->whereBetween('datetime', [$from, $to]);
+                }
+        */
         if (isset($data['start']) && isset($data['end'])) {
             $this->obj = $this->obj
                 ->whereDate('start', '>=', $data['start'])
@@ -92,21 +92,21 @@ class TaskRepository implements TaskContract
     public function orderBy($obj, $order, $by = 'ASC')
     {
         if ($order == 'type') {
-            $this->obj =  $obj->leftJoin('task_types', 'tasks.type_id', '=', 'task_types.id')
+            $this->obj = $obj->leftJoin('task_types', 'tasks.type_id', '=', 'task_types.id')
                 ->orderBy('name', $by);
         }
         if ($order == 'status') {
-            $this->obj =  $obj->leftJoin('statuses', 'tasks.status_id', '=', 'statuses.id')
+            $this->obj = $obj->leftJoin('statuses', 'tasks.status_id', '=', 'statuses.id')
                 ->orderBy('name', $by);
         }
         if ($order == 'destinateds') {
-            $this->obj =  $obj->addSelect('tasks.*')
+            $this->obj = $obj->addSelect('tasks.*')
                 ->leftJoin('task_destinated', 'tasks.id', '=', 'task_destinated.task_id')
                 ->leftJoin('users', 'task_destinated.user_id', '=', 'users.id')
                 ->orderBy('task_destinated.task_id');
         }
         if ($order == 'datetime') {
-            $this->obj =  $obj->orderBy($order, $by);
+            $this->obj = $obj->orderBy($order, $by);
         }
         return $this;
     }

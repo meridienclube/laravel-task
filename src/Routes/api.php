@@ -6,8 +6,8 @@ Route::middleware(['auth:api'])
     ->prefix('api/tasks')
     ->group(function () {
 
-        Route::name('status.')
-            ->prefix('status')
+        Route::name('statuses.')
+            ->prefix('statuses')
             ->group(function () {
                 Route::get('select2', 'TaskStatusController@select2')->name('select2');
                 Route::get('calendar', 'TaskStatusController@calendar')->name('calendar');
