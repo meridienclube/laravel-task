@@ -61,20 +61,25 @@ class TaskService
      */
     protected function prepareData($data)
     {
+        $carbon = new Carbon();
         $formatsDates = [
             'd/m/Y H:i',
             'd/m/Y H:i:s',
             'Y-m-d H:i',
             'Y-m-d H:i:s'
         ];
+        $start = $data['start']?? NULL;
+        $end = $data['end']?? NULL;
+        $data['start'] = NULL;
+        $data['end'] = NULL;
 
         foreach ($formatsDates as $dateFormat) {
-            if (isset($data['start']) && $this->validateDate($data['start'], $dateFormat)) {
-                $data['start'] = \DateTime::createFromFormat($dateFormat, $data['start'])
+            if (isset($start) && $this->validateDate($start, $dateFormat)) {
+                $data['start'] = \DateTime::createFromFormat($dateFormat, $start)
                     ->format('Y-m-d H:i:s');
             }
-            if (isset($data['end']) && $this->validateDate($data['end'], $dateFormat)) {
-                $data['end'] = \DateTime::createFromFormat($dateFormat, $data['end'])
+            if (isset($end) && $this->validateDate($end, $dateFormat)) {
+                $data['end'] = \DateTime::createFromFormat($dateFormat, $end)
                     ->format('Y-m-d H:i:s');
             }
         }
@@ -92,7 +97,6 @@ class TaskService
                 'ano' => 'year',
                 'anos' => 'years'
             ];
-            $carbon = new Carbon();
             $pos_carbon = strpos($data['datetime'], '+');
             if ($pos_carbon !== false) {
                 $date = explode(' ', $data['datetime']);
@@ -107,24 +111,18 @@ class TaskService
             $data['start'] = date('Y-m-d H:i:s');
         }
 
-        if (!isset($data['end']) || !$this->validateDate($data['start'])) {
+        if (isset($data['start']) && (!isset($data['end']) || !$this->validateDate($data['end']))) {
+            //$data['end'] = $carbon->instance($data['start'])->addMinutes(30)->toDateTimeString();
+            $data['end'] = $carbon->setDateTimeFrom($data['start'])->addMinutes(30)->toDateTimeString();
+        }
+
+        if (!isset($data['end']) || !$this->validateDate($data['end'])) {
             $data['end'] = date('Y-m-d H:i:s');
         }
 
         return $data;
     }
 
-
-    /*
-    protected function validateMysqlDate( $date ){
-        if (preg_match("/^(\d{4})-(\d{2})-(\d{2}) ([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/", $date, $matches)) {
-            if (checkdate($matches[2], $matches[3], $matches[1])) {
-                return true;
-            }
-        }
-        return false;
-    }
-*/
     public function calendar($data)
     {
         $data['format'] = $data['f'] ?? 'month';
@@ -151,8 +149,10 @@ class TaskService
             foreach ($this_weeks as $this_week) {
                 $data['days_of_the_week'][$this_week] = date('Y-m-d H:i:s', strtotime($this_week . ' this week', strtotime($data['day'])));
             }
-            $monday_this_week = date('Y-m-d H:i:s', strtotime('monday this week'));
-            $friday_this_week = date('Y-m-d H:i:s', strtotime('friday this week'));
+
+            $monday_this_week = date('Y-m-d H:i:s', strtotime('monday this week', strtotime($data['day'])));
+            $friday_this_week = date('Y-m-d H:i:s', strtotime('sunday this week', strtotime($data['day'])));
+
             $data['tasks'] = resolve('TaskService')->whereBetween('start', $monday_this_week, $friday_this_week)->get();
 
         } else {

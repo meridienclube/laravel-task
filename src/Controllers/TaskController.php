@@ -80,10 +80,16 @@ class TaskController extends Controller
     public function datatable(Request $request)
     {
         $data = $request->all();
+
         $data['where'] = array();
         if(isset($data['data'])) {
             parse_str($data['data'], $data['where']);
         }
+
+        if(isset($data['where']['see_completed'])){
+            $data['where']['withoutGlobalScope'] = 'ConfrariaWeb\Task\Scopes\TaskStatusClosedScope';
+        }
+
         if(isset($data['where']['see_completed'])){
             $data['without_scopes'][] = '\ConfrariaWeb\Task\Scope\TaskStatusClosedScope::class';
         }
@@ -153,10 +159,13 @@ class TaskController extends Controller
 
     public function index(Request $request)
     {
-        $all = $request->all();
-        //dd($request->responsibles);
-        $this->data['responsibles'] = ($request->responsibles) ? resolve('UserService')->whereIn('id', $request->responsibles)->get() : NULL;
-        //dd($this->data['responsibles']->pluck('name', 'id'));
+        $data = $request->all();
+
+        if(isset($data['see_completed'])){
+            $this->data['withoutGlobalScope'] = 'ConfrariaWeb\Task\Scopes\TaskStatusClosedScope';
+        }
+        $this->data['responsibles'] = isset($data['responsibles']) ? resolve('UserService')->whereIn('id', $data['responsibles'])->get() : NULL;
+
         return view(config('cw_task.views') . 'tasks.index', $this->data);
     }
 
