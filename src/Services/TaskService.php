@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use ConfrariaWeb\Task\Resources\TaskResource;
 use Illuminate\Support\Facades\Log;
 use ConfrariaWeb\Vendor\Traits\ServiceTrait;
+use Illuminate\Support\Str;
 
 class TaskService
 {
@@ -170,15 +171,25 @@ class TaskService
             $str = date('w', mktime(0, 0, 0, date('m', $timestamp), 1, date('Y', $timestamp)));
             $tasksFrom = $ym . '-01';
             $tasksTo = $ym . '-' . $day_count;
+            //dd($tasksFrom, $tasksTo);
             $tasks = $this->obj->whereBetween('start', $tasksFrom, $tasksTo)->get();
+            //dd($tasks);
             $data['weeks'] = array();
             $week = '';
             $week .= str_repeat('<td></td>', $str);
+            //$teste = [];
             for ($day = 1; $day <= $day_count; $day++, $str++) {
-                $tasksDayFrom = $ym . '-' . str_pad($day, 2, '0', STR_PAD_LEFT) . ' 00:00:00';
-                $tasksDayTo = $ym . '-' . str_pad($day, 2, '0', STR_PAD_LEFT) . ' 11:59:59';
+
+                $tasksDay = $ym . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+                //$tasksDayFrom = $ym . '-' . str_pad($day, 2, '0', STR_PAD_LEFT) . ' 00:00:00';
+                //$tasksDayTo = $ym . '-' . str_pad($day, 2, '0', STR_PAD_LEFT) . ' 11:59:59';
                 //dd($tasksDayFrom);
-                $tasksDay = $tasks->whereBetween('start', [$tasksDayFrom, $tasksDayTo]);
+                //$tasksDay = $tasks->whereBetween('start', [$tasksDayFrom, $tasksDayTo]);
+                $tasksDay = $tasks->filter(function ($value, $key) use($tasksDay) {
+                    return (Str::contains($value->start->format('Y-m-d'), $tasksDay))? $value : false;
+                });
+                //$teste[$day] = $tasksDay;
+                //dd($tasksDayFrom, $tasksDayTo, $day_count);
                 $date = $ym . '-' . $day;
                 if ($today == $date) {
                     $week .= "<td class='today' scope='row' class='bg-warning'><span class='span_day bg-info text-white'>" . $day . "</span>";
@@ -187,6 +198,7 @@ class TaskService
                 }
                 $week .= "<ul>";
                 foreach ($tasksDay as $taskDay) {
+
                     $week .= "<li><a data-task='" . $taskDay->format() . "' href='javascript:void(0)' style='background:" . $taskDay->type->color . "' class='task_link'>" . $taskDay->type->name . "</a></li>";
                 }
                 $week .= "</ul>";
@@ -200,6 +212,7 @@ class TaskService
                     $week = '';
                 }
             }
+            //dd($teste);
         }
 
         return $data;
