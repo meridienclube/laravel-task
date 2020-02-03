@@ -16,6 +16,7 @@ use ConfrariaWeb\Task\Resources\UserResource;
 use ConfrariaWeb\Task\Scopes\TaskStatusClosedScope;
 use ConfrariaWeb\Task\Services\TaskService;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 
 class TaskController extends Controller
 {
@@ -188,6 +189,8 @@ class TaskController extends Controller
 
     public function show($id)
     {
+
+        $data['where']['withoutGlobalScope'] = 'ConfrariaWeb\Task\Scopes\TaskStatusClosedScope';
         $this->data['task'] = resolve('TaskService')->find($id);
         abort_unless($this->data['task'], 404);
         $this->authorize('view', $this->data['task']);
