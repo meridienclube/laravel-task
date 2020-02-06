@@ -1,5 +1,6 @@
 {
     "name": "confrariaweb/laravel-task",
+    "version": "dev-master",
     "description": "Laravel Task Pack",
     "keywords": [
         "task",

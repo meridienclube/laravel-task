@@ -42,13 +42,13 @@ class TaskRepository implements TaskContract
         if (isset($data['start']) && isset($data['end'])) {
             $this->obj = $this->obj
                 ->whereDate('start', '>=', $data['start'])
-                ->whereDate('end', '<=', $data['end']);
+                ->whereDate('start', '<=', $data['end']);
         }else if(isset($data['start']) && !isset($data['end'])){
             $this->obj = $this->obj
                 ->whereDate('start', '>=', $data['start']);
         }else if(!isset($data['start']) && isset($data['end'])){
             $this->obj = $this->obj
-                ->whereDate('end', '<=', $data['end']);
+                ->whereDate('start', '<=', $data['end']);
         }
 
         if (isset($data['type_id'])) {
