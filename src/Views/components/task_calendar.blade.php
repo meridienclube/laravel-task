@@ -9,10 +9,10 @@
         </div>
         <div class="col-6">
             <div class="btn-group float-right" role="group" aria-label="">
-                <a href="{{ route('admin.tasks.calendar') }}" class="btn btn-secondary btn-sm">{{ __('month') }}</a>
-                <!--button type="button" class="btn btn-secondary btn-sm">{{ __('week') }}</button-->
-                <!--button type="button" class="btn btn-secondary btn-sm">{{ __('day') }}</button-->
-                <a href="{{ route('admin.tasks.index') }}" class="btn btn-secondary btn-sm">{{ __('list') }}</a>
+                <a href="{{ route('admin.tasks.calendar') }}" class="btn btn-secondary btn-sm">{{ __('Mês') }}</a>
+                <!--button type="button" class="btn btn-secondary btn-sm">{{ __('Semana') }}</button-->
+                <!--button type="button" class="btn btn-secondary btn-sm">{{ __('Dia) }}</button-->
+                <a href="{{ route('admin.tasks.index') }}" class="btn btn-secondary btn-sm">{{ __('Lista') }}</a>
             </div>
         </div>
     </div>
