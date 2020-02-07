@@ -30,13 +30,13 @@
                         <li class="kt-nav__item">
                             <a href="{{ route('admin.tasks.show', $task->id) }}" class="kt-nav__link">
                                 <i class="kt-nav__link-icon flaticon-visible"></i>
-                                <span class="kt-nav__link-text">{{ trans('meridien.tasks.show') }}</span>
+                                <span class="kt-nav__link-text">{{ trans('Visualizar') }}</span>
                             </a>
                         </li>
                         <li class="kt-nav__item">
                             <a href="{{ route('admin.tasks.edit', $task->id) }}" class="kt-nav__link">
                                 <i class="kt-nav__link-icon flaticon2-edit"></i>
-                                <span class="kt-nav__link-text">{{ trans('meridien.tasks.edit') }}</span>
+                                <span class="kt-nav__link-text">{{ trans('Editar') }}</span>
                             </a>
                         </li>
                     </ul>
@@ -65,7 +65,7 @@
                             </div>
                             <div class="kt-widget__action">
                                 <a href="{{ route('admin.tasks.show', $task->id) }}" class="btn btn-label-brand btn-bold btn-sm btn-upper">
-                                    {{ trans('meridien.tasks.show') }}
+                                    {{ trans('Ver') }}
                                 </a>
                             </div>
                         </div>
