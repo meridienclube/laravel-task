@@ -25,6 +25,7 @@ class TaskController extends Controller
 
     public function __construct(Request $request)
     {
+        $this->data['options'] = resolve('OptionService')->WhereIn('name', ['description'])->get();
         $this->data['types'] = resolve('TaskTypeService')->all();
         $this->data['closure_status'] = resolve('TaskStatusService')->where(['closure' => 1])->first();
         $this->data['statuses'] = resolve('TaskStatusService')->all();
@@ -190,7 +191,7 @@ class TaskController extends Controller
     public function show($id)
     {
 
-        $data['where']['withoutGlobalScope'] = 'ConfrariaWeb\Task\Scopes\TaskStatusClosedScope';
+        //$data['where']['withoutGlobalScope'] = 'ConfrariaWeb\Task\Scopes\TaskStatusClosedScope';
         $this->data['task'] = resolve('TaskService')->find($id);
         abort_unless($this->data['task'], 404);
         $this->authorize('view', $this->data['task']);
@@ -201,6 +202,7 @@ class TaskController extends Controller
 
     public function edit(Request $request, $id)
     {
+        //$data['where']['withoutGlobalScope'] = 'ConfrariaWeb\Task\Scopes\TaskStatusClosedScope';
         $this->data['calendar'] = resolve('TaskService')->calendar($request->all());
         $this->data['task'] = resolve('TaskService')->find($id);
         abort_unless($this->data['task'], 404);

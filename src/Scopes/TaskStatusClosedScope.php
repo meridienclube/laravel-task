@@ -12,7 +12,10 @@ class TaskStatusClosedScope implements Scope
     public function apply(Builder $builder, Model $model)
     {
 
-        if (!app()->runningInConsole() && \Route::currentRouteName() != 'admin.tasks.show') {
+        if (
+            !app()->runningInConsole() &&
+            \Route::currentRouteName() != 'admin.tasks.show' &&
+            \Route::currentRouteName() != 'admin.tasks.edit') {
             $ids = DB::table('task_statuses')
                 ->distinct()
                 ->where(['closure' => 1])
