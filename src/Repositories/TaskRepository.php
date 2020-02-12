@@ -75,9 +75,9 @@ class TaskRepository implements TaskContract
             $this->obj = $this->obj->whereIn('status_id', $data['statuses']);
         }
 
-        if (isset($data['employees']) && is_array($data['employees'])) {
-            $this->obj = $this->obj->whereHas('employees', function ($query) use ($data) {
-                $query->whereIn('users.id', $data['employees']);
+        if (isset($data['destinateds']) && is_array($data['destinateds'])) {
+            $this->obj = $this->obj->whereHas('destinateds', function ($query) use ($data) {
+                $query->whereIn('users.id', $data['destinateds']);
             });
         }
 
