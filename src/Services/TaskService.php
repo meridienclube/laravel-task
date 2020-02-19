@@ -199,7 +199,7 @@ class TaskService
                 $week .= "<ul>";
                 foreach ($tasksDay as $taskDay) {
 
-                    $week .= "<li><a data-task='" . $taskDay->format() . "' href='javascript:void(0)' style='background:" . $taskDay->type->color . "' class='task_link'>" . $taskDay->type->name . "</a></li>";
+                    $week .= "<li><a data-task='" . $taskDay->format() . "' href='javascript:void(0)' style='background:" . $taskDay->type->color . "' class='task_link'>" . $taskDay->type->name . " para " . $taskDay->destinateds->implode('name', ' | ')  . "</a></li>";
                 }
                 $week .= "</ul>";
                 $week .= "</td>";
