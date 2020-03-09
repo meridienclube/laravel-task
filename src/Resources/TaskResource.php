@@ -17,7 +17,7 @@ class TaskResource extends JsonResource
             'datetime' => $this->datetime?? '',
             'start' => $this->start?? '',
             //'end' => Carbon::parse($this->start)->addHour(),
-            'end' => $this->end,
+            'end' => $this->end?? '',
             'date' => isset($this->start)? $this->start->format('d/m/Y') : '',
             'time' => isset($this->start)? $this->start->format('H:i') : '',
             'description' => option($this, 'description', NULL),

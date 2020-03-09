@@ -41,8 +41,9 @@ class TaskRepository implements TaskContract
 
         if (isset($data['start']) && isset($data['end'])) {
             $this->obj = $this->obj
-                ->whereDate('start', '>=', $data['start'])
-                ->whereDate('start', '<=', $data['end']);
+                /*->whereDate('start', '>=', $data['start'])
+                ->whereDate('start', '<=', $data['end']);*/
+                ->whereBetween('start', [$data['start'], $data['end']]);
         }else if(isset($data['start']) && !isset($data['end'])){
             $this->obj = $this->obj
                 ->whereDate('start', '>=', $data['start']);
