@@ -140,6 +140,7 @@ class TaskRepository implements TaskContract
         }
 
         if (isset($data['destinateds'])) {
+
             $data['users'] = array_unique(array_merge($data['destinateds'], isset($data['users']) ? $data['users'] : []));
             $obj->destinateds()->sync($data['destinateds']);
         }
