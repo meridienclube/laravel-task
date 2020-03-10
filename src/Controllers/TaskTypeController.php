@@ -5,6 +5,8 @@ namespace ConfrariaWeb\Task\Controllers;
 use ConfrariaWeb\Task\Requests\StoreTaskTypeRequest;
 use ConfrariaWeb\Task\Requests\UpdateTaskTypeRequest;
 use App\Http\Controllers\Controller;
+use ConfrariaWeb\Task\Resources\Select2TaskTypeResource;
+use Illuminate\Http\Request;
 
 class TaskTypeController extends Controller
 {
@@ -14,6 +16,14 @@ class TaskTypeController extends Controller
     public function __construct()
     {
         $this->data = [];
+    }
+
+    public function select2(Request $request)
+    {
+        $data = $request->all();
+        $data['name'] = isset($data['term']) ? $data['term'] : NULL;
+        $types = resolve('TaskTypeService')->where($data)->get();
+        return Select2TaskTypeResource::collection($types);
     }
 
     /**

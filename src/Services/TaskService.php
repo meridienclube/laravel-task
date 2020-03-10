@@ -62,7 +62,8 @@ class TaskService
      */
     protected function prepareData($data)
     {
-        $carbon = new Carbon();
+
+        //$carbon = new Carbon();
         $formatsDates = [
             'd/m/Y H:i',
             'd/m/Y H:i:s',
@@ -71,8 +72,8 @@ class TaskService
         ];
         $start = $data['start']?? NULL;
         $end = $data['end']?? NULL;
-        $data['start'] = NULL;
-        $data['end'] = NULL;
+        //$data['start'] = NULL;
+        //$data['end'] = NULL;
 
         foreach ($formatsDates as $dateFormat) {
             if (isset($start) && $this->validateDate($start, $dateFormat)) {
@@ -85,7 +86,7 @@ class TaskService
             }
         }
 
-        if (!isset($data['start']) && !isset($data['end']) && isset($data['datetime'])) {
+        /*if (!isset($data['start']) && !isset($data['end']) && isset($data['datetime'])) {
             $text_convert = [
                 'minuto' => 'minute',
                 'minutos' => 'minutes',
@@ -106,8 +107,9 @@ class TaskService
                 $data['end'] = $carbon->add($date[1] . ' ' . $period)->addMinutes(30)->toDateTimeString();
             }
 
-        }
+        }*/
 
+        /*
         if (!isset($data['start']) || !$this->validateDate($data['start'])) {
             $data['start'] = date('Y-m-d H:i:s');
         }
@@ -120,6 +122,9 @@ class TaskService
         if (!isset($data['end']) || !$this->validateDate($data['end'])) {
             $data['end'] = date('Y-m-d H:i:s');
         }
+        */
+
+        //dd($data);
 
         return $data;
     }

@@ -18,12 +18,10 @@ class TaskTypeRepository implements TaskTypeContract
 
     public function where(array $data = [], $take = null)
     {
-        $w = $this->obj;
         if (isset($data['types']) && is_array($data['types'])) {
-            $w = $w->whereIn('tasks.id', $data['types']);
+            $this->obj = $this->obj->whereIn('tasks.id', $data['types']);
         }
-        $w = isset($take) ? $w->paginate($take) : $w->get();
-        return $w;
+        return $this;
     }
 
     protected function syncs($obj, $data)
