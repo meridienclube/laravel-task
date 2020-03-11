@@ -61,11 +61,13 @@
                                 {{ $task->type->name }}
                             </a>
                             <div class="kt-widget__button">
-                                <span class="btn btn-label-warning btn-sm">{{ $task->start->format('d/m/Y') }}</span>
+                                <span class="btn btn-label-warning btn-sm">
+                                    {{ isset($task->start)? $task->start->format('d/m/Y') : NULL }}
+                                </span>
                             </div>
                             <div class="kt-widget__action">
                                 <a href="{{ route('admin.tasks.show', $task->id) }}" class="btn btn-label-brand btn-bold btn-sm btn-upper">
-                                    {{ trans('Ver') }}
+                                    {{ __('Ver') }}
                                 </a>
                             </div>
                         </div>
