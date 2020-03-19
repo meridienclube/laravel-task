@@ -8,7 +8,7 @@ trait TaskTrait
 {
 
     /*
-     * Metodo utilizado em conjunto ao pacote "confrariaweb/laravel-task"
+     * Metodo utilizado em conjunto ao pacote "meridienclube/laravel-task"
      */
     public function tasks()
     {
@@ -16,7 +16,7 @@ trait TaskTrait
     }
 
     /*
-     * Metodo utilizado em conjunto ao pacote "confrariaweb/laravel-task"
+     * Metodo utilizado em conjunto ao pacote "meridienclube/laravel-task"
      */
     public function responsibleTasks()
     {
@@ -24,7 +24,7 @@ trait TaskTrait
     }
 
     /*
-     * Metodo utilizado em conjunto ao pacote "confrariaweb/laravel-task"
+     * Metodo utilizado em conjunto ao pacote "meridienclube/laravel-task"
      */
     public function destinatedTasks()
     {

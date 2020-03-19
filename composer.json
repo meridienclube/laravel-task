@@ -1,5 +1,5 @@
 {
-    "name": "confrariaweb/laravel-task",
+    "name": "meridienclube/laravel-task",
     "version": "dev-master",
     "description": "Laravel Task Pack",
     "keywords": [
@@ -16,15 +16,15 @@
         }
     ],
     "require": {
-        "confrariaweb/laravel-comment": "dev-master",
-        "confrariaweb/laravel-datetimepicker": "dev-master",
-        "confrariaweb/laravel-entrust": "dev-master",
-        "confrariaweb/laravel-historic": "dev-master",
-        "confrariaweb/laravel-modal": "dev-master",
-        "confrariaweb/laravel-option": "dev-master",
-        "confrariaweb/laravel-select2": "dev-master",
-        "confrariaweb/laravel-user": "dev-master",
-        "confrariaweb/laravel-vendor": "dev-master"
+        "meridienclube/laravel-comment": "dev-master",
+        "meridienclube/laravel-datetimepicker": "dev-master",
+        "meridienclube/laravel-entrust": "dev-master",
+        "meridienclube/laravel-historic": "dev-master",
+        "meridienclube/laravel-modal": "dev-master",
+        "meridienclube/laravel-option": "dev-master",
+        "meridienclube/laravel-select2": "dev-master",
+        "meridienclube/laravel-user": "dev-master",
+        "meridienclube/laravel-vendor": "dev-master"
     },
     "autoload": {
         "psr-4": {
